@@ -56,4 +56,56 @@ class UserFactory extends Factory
             'two_factor_confirmed_at' => now(),
         ]);
     }
+
+    /**
+     * Create a user in EU region.
+     */
+    public function forRegionEU(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'region' => 'EU',
+        ]);
+    }
+
+    /**
+     * Create a user in US region.
+     */
+    public function forRegionUS(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'region' => 'US',
+        ]);
+    }
+
+    /**
+     * Create a user with approved status.
+     */
+    public function approved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+        ]);
+    }
+
+    /**
+     * Create a user with pending approval status.
+     */
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => 'pending',
+            'approved_at' => null,
+        ]);
+    }
+
+    /**
+     * Create an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_admin' => true,
+        ]);
+    }
 }

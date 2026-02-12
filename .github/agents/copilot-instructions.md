@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-11
 - SQL Server (`sqlsrv`), Laravel filesystem disks (local/public) (001-pass-type-samples)
 - PHP 8.3 / Laravel 11 + Laravel (Eloquent, Inertia), QRCode.js, Laravel HTTP Clien (001-pass-distribution)
 - PostgreSQL + Eloquent ORM (PassDistributionLink model) (001-pass-distribution)
+- PHP 8.3 / Laravel 11 (backend) + TypeScript / React 18 (frontend) + Laravel (Eloquent, Inertia, Form Requests, Authorization), React 18, Vite 7.3.1, Wayfinder 0.1.3 (type-safe routes) (002-account-wallet-setup)
+- PostgreSQL (single instance with region column; new tables: users.region, AppleCertificate, GoogleCredential, BusinessDomain, AccountTier, OnboardingStep) (002-account-wallet-setup)
 
 - PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder (001-pass-image-resize-preview)
 
@@ -26,8 +28,8 @@ npm test && npm run lint
 PHP 8.3, TypeScript 5.7, React 19: Follow standard conventions
 
 ## Recent Changes
+- 002-account-wallet-setup: Added PHP 8.3 / Laravel 11 (backend) + TypeScript / React 18 (frontend) + Laravel (Eloquent, Inertia, Form Requests, Authorization), React 18, Vite 7.3.1, Wayfinder 0.1.3 (type-safe routes)
 - 001-pass-distribution: Added PHP 8.3 / Laravel 11 + Laravel (Eloquent, Inertia), QRCode.js, Laravel HTTP Clien
-- 001-pass-type-samples: Added PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder
 - 001-pass-type-samples: Added PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder
 
 

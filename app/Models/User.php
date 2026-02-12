@@ -26,6 +26,12 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'region',
+        'tier',
+        'industry',
+        'approval_status',
+        'approved_at',
+        'approved_by',
         'business_name',
         'business_address',
         'business_phone',
@@ -63,6 +69,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -80,5 +87,53 @@ class User extends Authenticatable
     public function passTemplates(): HasMany
     {
         return $this->hasMany(PassTemplate::class);
+    }
+
+    /**
+     * Get the Apple certificates for the user.
+     */
+    public function appleCertificates(): HasMany
+    {
+        return $this->hasMany(AppleCertificate::class);
+    }
+
+    /**
+     * Get the Google credentials for the user.
+     */
+    public function googleCredentials(): HasMany
+    {
+        return $this->hasMany(GoogleCredential::class);
+    }
+
+    /**
+     * Get the onboarding steps for the user.
+     */
+    public function onboardingSteps(): HasMany
+    {
+        return $this->hasMany(OnboardingStep::class);
+    }
+
+    /**
+     * Check if user is approved for production access.
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    /**
+     * Get the current tier of the user.
+     */
+    public function currentTier(): string
+    {
+        return $this->tier ?? 'Email_Verified';
+    }
+
+    /**
+     * Check if user can access wallet setup.
+     */
+    public function canAccessWalletSetup(): bool
+    {
+        return $this->email_verified_at !== null;
     }
 }
