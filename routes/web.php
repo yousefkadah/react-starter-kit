@@ -3,12 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\PassDistributionController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
+
+// Public distribution link route (no authentication required)
+Route::get('p/{slug}', [PassDistributionController::class, 'show'])
+    ->name('passes.show-by-link');
 
 Route::get('dashboard', function () {
     $user = auth()->user();

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Apple, ArrowLeft, Check, Chrome, Copy, Download, Edit, ExternalLink, QrCode, Trash2 } from 'lucide-react';
+import { Apple, ArrowLeft, Check, Chrome, Copy, Download, Edit, ExternalLink, QrCode, Share2, Trash2 } from 'lucide-react';
 import { Pass, PassStatus } from '@/types/pass';
 import { PassPreview } from '@/components/pass-preview';
 import { format } from 'date-fns';
@@ -25,10 +25,9 @@ import { useClipboard } from '@/hooks/use-clipboard';
 
 interface PassesShowProps {
   pass: Pass;
-  publicUrl: string;
 }
 
-export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
+export default function PassesShow({ pass }: PassesShowProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [googleLink, setGoogleLink] = useState(pass.google_save_url);
   const { copy, copied } = useClipboard();
@@ -100,6 +99,12 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
               <Link href={passes.edit({ pass: pass.id }).url}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/passes/${pass.id}/distribution-links`}>
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
               </Link>
             </Button>
             <Button
@@ -282,59 +287,7 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
             </CardContent>
           </Card>
 
-          {/* Public Sharing */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Public Sharing</CardTitle>
-              <CardDescription>
-                Share this pass with others using a public link
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Public URL</Label>
-                <div className="flex gap-2">
-                  <Input value={publicUrl} readOnly className="font-mono text-sm" />
-                  <Button
-                    variant="outline"
-                    onClick={() => copy(publicUrl)}
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Anyone with this link can view and download the pass
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Button variant="outline" asChild>
-                  <a href={publicUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View Public Page
-                  </a>
-                </Button>
-                <Button variant="outline" asChild>
-                  <a
-                    href={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(publicUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <QrCode className="mr-2 h-4 w-4" />
-                    View QR Code
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Public Sharing - Removed: Use the Share button above to manage distribution links */}
 
           {/* Pass Data */}
           <Card>

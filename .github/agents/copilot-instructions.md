@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-11
 ## Active Technologies
 - SQL Server (default `sqlsrv`), Laravel filesystem disks (local/public) (001-pass-image-resize-preview)
 - SQL Server (`sqlsrv`), Laravel filesystem disks (local/public) (001-pass-type-samples)
+- PHP 8.3 / Laravel 11 + Laravel (Eloquent, Inertia), QRCode.js, Laravel HTTP Clien (001-pass-distribution)
+- PostgreSQL + Eloquent ORM (PassDistributionLink model) (001-pass-distribution)
 
 - PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder (001-pass-image-resize-preview)
 
@@ -24,9 +26,9 @@ npm test && npm run lint
 PHP 8.3, TypeScript 5.7, React 19: Follow standard conventions
 
 ## Recent Changes
+- 001-pass-distribution: Added PHP 8.3 / Laravel 11 + Laravel (Eloquent, Inertia), QRCode.js, Laravel HTTP Clien
 - 001-pass-type-samples: Added PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder
 - 001-pass-type-samples: Added PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder
-- 001-pass-image-resize-preview: Added PHP 8.3, TypeScript 5.7, React 19 + Laravel 12, Inertia.js v2, Tailwind CSS v4, Wayfinder
 
 
 <!-- MANUAL ADDITIONS START -->
