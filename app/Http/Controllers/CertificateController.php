@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TierProgressionJob;
 use App\Models\AppleCertificate;
 use App\Models\GoogleCredential;
 use App\Models\User;
@@ -102,8 +103,8 @@ class CertificateController extends Controller
                 'fingerprint' => $validation['fingerprint'],
             ]);
 
-            // TODO: Trigger TierProgressionJob
-            // TierProgressionJob::dispatch($user);
+            // Trigger tier progression evaluation
+            TierProgressionJob::dispatch($user);
 
             return response()->json([
                 'message' => 'Certificate uploaded successfully',
@@ -163,8 +164,8 @@ class CertificateController extends Controller
                 'last_rotated_at' => now(),
             ]);
 
-            // TODO: Trigger TierProgressionJob
-            // TierProgressionJob::dispatch($user);
+            // Trigger tier progression evaluation
+            TierProgressionJob::dispatch($user);
 
             return response()->json([
                 'message' => 'Google credentials uploaded successfully',

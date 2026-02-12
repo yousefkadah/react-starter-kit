@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\PassApiController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\Admin\ProductionApprovalController;
 use Illuminate\Support\Facades\Route;
 
 // Public signup endpoint
@@ -12,6 +13,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Account endpoints
     Route::get('/account', [AccountController::class, 'show']);
     Route::put('/account', [AccountController::class, 'update']);
+
+    // Tier progression endpoints
+    Route::post('/tier/request-production', [ProductionApprovalController::class, 'requestProduction']);
+    Route::post('/tier/request-live', [ProductionApprovalController::class, 'requestLive']);
+    Route::post('/tier/go-live', [ProductionApprovalController::class, 'goLive']);
 
     // Certificate endpoints
     Route::get('/certificates/apple/csr', [CertificateController::class, 'downloadAppleCSR']);
