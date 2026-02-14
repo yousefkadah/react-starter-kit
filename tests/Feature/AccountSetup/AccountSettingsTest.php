@@ -42,7 +42,7 @@ class AccountSettingsTest extends TestCase
             'approval_status' => 'approved',
             'region' => 'US',
         ]);
-        
+
         $user->update([
             'name' => null,
             'industry' => null,
