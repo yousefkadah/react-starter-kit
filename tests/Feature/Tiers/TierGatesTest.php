@@ -15,7 +15,7 @@ class TierGatesTest extends TestCase
     /**
      * Test user cannot request production unless requirements are met.
      */
-    public function testUserCannotRequestProductionWithoutRequirements(): void
+    public function test_user_cannot_request_production_without_requirements(): void
     {
         $user = User::factory()->approved()->create([
             'tier' => 'Email_Verified',
@@ -29,7 +29,7 @@ class TierGatesTest extends TestCase
     /**
      * Test unapproved users cannot access account settings.
      */
-    public function testUnapprovedUserCannotAccessAccountSettings(): void
+    public function test_unapproved_user_cannot_access_account_settings(): void
     {
         $user = User::factory()->pending()->create([
             'tier' => 'Email_Verified',
@@ -43,7 +43,7 @@ class TierGatesTest extends TestCase
     /**
      * Test user can request production only when both certs exist.
      */
-    public function testUserCanRequestProductionWhenConfigured(): void
+    public function test_user_can_request_production_when_configured(): void
     {
         $user = User::factory()->approved()->create([
             'tier' => 'Verified_And_Configured',
@@ -60,7 +60,7 @@ class TierGatesTest extends TestCase
     /**
      * Test user cannot go live unless in Production tier.
      */
-    public function testUserCannotGoLiveWhenNotProduction(): void
+    public function test_user_cannot_go_live_when_not_production(): void
     {
         $user = User::factory()->approved()->create([
             'tier' => 'Verified_And_Configured',

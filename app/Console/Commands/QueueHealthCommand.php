@@ -34,17 +34,17 @@ class QueueHealthCommand extends Command
             : null;
 
         $this->info('Queue Health');
-        $this->line('Pending jobs: ' . $pending);
-        $this->line('Failed jobs: ' . $failed);
+        $this->line('Pending jobs: '.$pending);
+        $this->line('Failed jobs: '.$failed);
 
         if ($latestFailed) {
-            $this->line('Last failed job ID: ' . $latestFailed->id);
-            $this->line('Last failed at: ' . $latestFailed->failed_at);
+            $this->line('Last failed job ID: '.$latestFailed->id);
+            $this->line('Last failed at: '.$latestFailed->failed_at);
         } else {
             $this->line('Last failed at: none');
         }
 
-        if (!Schema::hasTable('jobs')) {
+        if (! Schema::hasTable('jobs')) {
             $this->line('Note: jobs table not found (queue connection may be non-database).');
         }
 

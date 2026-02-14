@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\PassApiController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\Admin\ProductionApprovalController;
+use App\Http\Controllers\Api\PassApiController;
+use App\Http\Controllers\CertificateController;
 use Illuminate\Support\Facades\Route;
 
 // Public signup endpoint

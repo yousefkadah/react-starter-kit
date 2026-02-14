@@ -20,9 +20,6 @@ class ProductionApprovalController extends Controller
 
     /**
      * List pending production tier requests.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -32,7 +29,7 @@ class ProductionApprovalController extends Controller
             ->paginate(15);
 
         return response()->json([
-            'requests' => $requests->map(fn($user) => [
+            'requests' => $requests->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -51,8 +48,6 @@ class ProductionApprovalController extends Controller
 
     /**
      * View approved production requests.
-     *
-     * @return JsonResponse
      */
     public function approved(): JsonResponse
     {
@@ -60,7 +55,7 @@ class ProductionApprovalController extends Controller
             ->paginate(15);
 
         return response()->json([
-            'requests' => $requests->map(fn($user) => [
+            'requests' => $requests->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -79,8 +74,6 @@ class ProductionApprovalController extends Controller
 
     /**
      * View rejected production requests.
-     *
-     * @return JsonResponse
      */
     public function rejected(): JsonResponse
     {
@@ -88,7 +81,7 @@ class ProductionApprovalController extends Controller
             ->paginate(15);
 
         return response()->json([
-            'requests' => $requests->map(fn($user) => [
+            'requests' => $requests->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -107,8 +100,6 @@ class ProductionApprovalController extends Controller
 
     /**
      * Request production tier upgrade.
-     *
-     * @return JsonResponse
      */
     public function requestProduction(): JsonResponse
     {
@@ -123,15 +114,13 @@ class ProductionApprovalController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Cannot request production: ' . $e->getMessage(),
+                'message' => 'Cannot request production: '.$e->getMessage(),
             ], 422);
         }
     }
 
     /**
      * Request to go live (pre-launch checklist validation).
-     *
-     * @return JsonResponse
      */
     public function requestLive(Request $request): JsonResponse
     {
@@ -154,7 +143,7 @@ class ProductionApprovalController extends Controller
 
             $valid = $this->tierService->requestLive($user);
 
-            if (!$valid) {
+            if (! $valid) {
                 return response()->json([
                     'message' => 'Pre-launch checklist requirements not met',
                     'missing_requirements' => $this->getMissingRequirements($user),
@@ -167,15 +156,13 @@ class ProductionApprovalController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Validation failed: ' . $e->getMessage(),
+                'message' => 'Validation failed: '.$e->getMessage(),
             ], 422);
         }
     }
 
     /**
      * Advance user to live tier.
-     *
-     * @return JsonResponse
      */
     public function goLive(): JsonResponse
     {
@@ -200,7 +187,7 @@ class ProductionApprovalController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to advance to live: ' . $e->getMessage(),
+                'message' => 'Failed to advance to live: '.$e->getMessage(),
             ], 422);
         }
     }
@@ -213,22 +200,22 @@ class ProductionApprovalController extends Controller
         $requirements = [];
 
         $hasAppleCert = $user->appleCertificates()->whereNull('deleted_at')->where('expiry_date', '>', now())->exists();
-        if (!$hasAppleCert) {
+        if (! $hasAppleCert) {
             $requirements[] = 'Valid Apple Wallet certificate required';
         }
 
         $hasGoogleCred = $user->googleCredentials()->whereNull('deleted_at')->exists();
-        if (!$hasGoogleCred) {
+        if (! $hasGoogleCred) {
             $requirements[] = 'Google Wallet credentials required';
         }
 
         $hasPasses = method_exists($user, 'passes') && $user->passes()->exists();
-        if (!$hasPasses) {
+        if (! $hasPasses) {
             $requirements[] = 'At least one pass must be created';
         }
 
         $checklist = $user->pre_launch_checklist ?? [];
-        if (!isset($checklist['tested_on_device']) || !$checklist['tested_on_device']) {
+        if (! isset($checklist['tested_on_device']) || ! $checklist['tested_on_device']) {
             $requirements[] = 'Must confirm testing on device';
         }
 
@@ -241,9 +228,6 @@ class ProductionApprovalController extends Controller
 
     /**
      * Approve a production tier request.
-     *
-     * @param User $user
-     * @return JsonResponse
      */
     public function approve(User $user): JsonResponse
     {
@@ -264,17 +248,13 @@ class ProductionApprovalController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to approve user: ' . $e->getMessage(),
+                'message' => 'Failed to approve user: '.$e->getMessage(),
             ], 422);
         }
     }
 
     /**
      * Reject a production tier request.
-     *
-     * @param Request $request
-     * @param User $user
-     * @return JsonResponse
      */
     public function reject(Request $request, User $user): JsonResponse
     {
@@ -299,7 +279,7 @@ class ProductionApprovalController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to reject request: ' . $e->getMessage(),
+                'message' => 'Failed to reject request: '.$e->getMessage(),
             ], 422);
         }
     }

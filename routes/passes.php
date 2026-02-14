@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\MediaLibraryAssetController;
 use App\Http\Controllers\PassController;
 use App\Http\Controllers\PassDistributionController;
 use App\Http\Controllers\PassDownloadController;
 use App\Http\Controllers\PassImageController;
 use App\Http\Controllers\PassTemplateController;
-use App\Http\Controllers\MediaLibraryAssetController;
 use App\Http\Controllers\PassTypeFieldMapController;
 use App\Http\Controllers\PassTypeSampleController;
 use Illuminate\Support\Facades\Route;

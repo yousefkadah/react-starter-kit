@@ -29,7 +29,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test CSR downloads with correct filename.
      */
-    public function testCsrDownloadsWithCorrectFilename(): void
+    public function test_csr_downloads_with_correct_filename(): void
     {
         Mail::fake();
 
@@ -42,7 +42,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test CSR content is valid PEM format.
      */
-    public function testCsrContentIsValidPemFormat(): void
+    public function test_csr_content_is_valid_pem_format(): void
     {
         Mail::fake();
 
@@ -63,7 +63,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test email with instructions is sent.
      */
-    public function testEmailWithInstructionsIsSent(): void
+    public function test_email_with_instructions_is_sent(): void
     {
         Mail::fake();
 
@@ -80,7 +80,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test CSR contains correct subject information.
      */
-    public function testCsrContainsCorrectSubjectInformation(): void
+    public function test_csr_contains_correct_subject_information(): void
     {
         Mail::fake();
 
@@ -99,7 +99,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test unauthenticated user cannot download CSR.
      */
-    public function testUnauthenticatedUserCannotDownloadCsr(): void
+    public function test_unauthenticated_user_cannot_download_csr(): void
     {
         Mail::fake();
 
@@ -111,7 +111,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test CSR downloads with correct content type.
      */
-    public function testCsrDownloadsWithCorrectContentType(): void
+    public function test_csr_downloads_with_correct_content_type(): void
     {
         Mail::fake();
 
@@ -124,7 +124,7 @@ class CSRGenerationTest extends TestCase
     /**
      * Test multiple CSR downloads work correctly.
      */
-    public function testMultipleCsrDownloadsWorkCorrectly(): void
+    public function test_multiple_csr_downloads_work_correctly(): void
     {
         Mail::fake();
 

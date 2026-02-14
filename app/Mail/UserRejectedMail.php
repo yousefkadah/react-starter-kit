@@ -16,9 +16,7 @@ class UserRejectedMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public ?string $reason = null)
-    {
-    }
+    public function __construct(public User $user, public ?string $reason = null) {}
 
     /**
      * Get the message envelope.

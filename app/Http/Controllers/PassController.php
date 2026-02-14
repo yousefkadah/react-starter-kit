@@ -146,6 +146,7 @@ class PassController extends Controller
         foreach ($overrides as $key => $value) {
             if ($value === null && array_key_exists($key, $rawOverrides) && $rawOverrides[$key] === '') {
                 $merged[$key] = '';
+
                 continue;
             }
 
@@ -159,6 +160,7 @@ class PassController extends Controller
                     $value,
                     is_array($rawOverrides[$key] ?? null) ? $rawOverrides[$key] : [],
                 );
+
                 continue;
             }
 

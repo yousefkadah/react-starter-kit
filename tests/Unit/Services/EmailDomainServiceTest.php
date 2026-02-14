@@ -21,7 +21,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test domain extraction from email.
      */
-    public function testExtractDomainFromEmail(): void
+    public function test_extract_domain_from_email(): void
     {
         $domain = $this->service->extractDomain('john@stripe.com');
         $this->assertEquals('stripe.com', $domain);
@@ -33,7 +33,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test business domain check with cache.
      */
-    public function testIsBusinessDomainWithCache(): void
+    public function test_is_business_domain_with_cache(): void
     {
         BusinessDomain::create(['domain' => 'stripe.com']);
 
@@ -54,7 +54,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test consumer domain returns false.
      */
-    public function testConsumerDomainNotWhitelisted(): void
+    public function test_consumer_domain_not_whitelisted(): void
     {
         BusinessDomain::create(['domain' => 'stripe.com']);
 
@@ -68,7 +68,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test case-insensitive domain matching.
      */
-    public function testDomainMatchingIsCaseInsensitive(): void
+    public function test_domain_matching_is_case_insensitive(): void
     {
         BusinessDomain::create(['domain' => 'Stripe.com']);
 
@@ -82,7 +82,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test cache invalidation.
      */
-    public function testCacheInvalidation(): void
+    public function test_cache_invalidation(): void
     {
         BusinessDomain::create(['domain' => 'stripe.com']);
 
@@ -98,7 +98,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test approval status for business domain.
      */
-    public function testApprovalStatusForBusinessDomain(): void
+    public function test_approval_status_for_business_domain(): void
     {
         BusinessDomain::create(['domain' => 'stripe.com']);
 
@@ -109,7 +109,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test approval status for consumer domain.
      */
-    public function testApprovalStatusForConsumerDomain(): void
+    public function test_approval_status_for_consumer_domain(): void
     {
         BusinessDomain::create(['domain' => 'stripe.com']);
 
@@ -120,7 +120,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test queue for approval.
      */
-    public function testQueueForApproval(): void
+    public function test_queue_for_approval(): void
     {
         $user = User::factory()->approved()->create();
 
@@ -134,7 +134,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test approve account.
      */
-    public function testApproveAccount(): void
+    public function test_approve_account(): void
     {
         $user = User::factory()->pending()->create();
         $admin = User::factory()->admin()->create();
@@ -150,7 +150,7 @@ class EmailDomainServiceTest extends TestCase
     /**
      * Test reject account.
      */
-    public function testRejectAccount(): void
+    public function test_reject_account(): void
     {
         $user = User::factory()->pending()->create();
         $admin = User::factory()->admin()->create();

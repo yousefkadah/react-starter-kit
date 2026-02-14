@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\PassDistributionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
-use App\Http\Controllers\PassDistributionController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [

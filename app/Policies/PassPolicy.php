@@ -65,4 +65,3 @@ class PassPolicy
         return $user->id === $pass->user_id && $link->pass_id === $pass->id;
     }
 }
-

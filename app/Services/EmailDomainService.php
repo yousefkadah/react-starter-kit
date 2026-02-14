@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\Cache;
 class EmailDomainService
 {
     const CACHE_KEY = 'business_domains:all';
+
     const CACHE_TTL = 3600; // 1 hour
 
     /**
      * Check if an email domain is a business domain (whitelisted).
      *
-     * @param string $email The email address to check
+     * @param  string  $email  The email address to check
      * @return bool True if domain is whitelisted, false otherwise
      */
     public function isBusinessDomain(string $email): bool
@@ -32,19 +33,20 @@ class EmailDomainService
     /**
      * Extract domain from email address.
      *
-     * @param string $email The email address
+     * @param  string  $email  The email address
      * @return string The domain part (e.g., 'example.com' from 'user@example.com')
      */
     public function extractDomain(string $email): string
     {
         $parts = explode('@', $email);
+
         return end($parts) ?? '';
     }
 
     /**
      * Determine approval status based on email domain.
      *
-     * @param string $email The email address
+     * @param  string  $email  The email address
      * @return string Either 'approved' or 'pending'
      */
     public function getApprovalStatus(string $email): string
@@ -63,7 +65,7 @@ class EmailDomainService
     /**
      * Queue a user for manual approval.
      *
-     * @param User $user The user to queue
+     * @param  User  $user  The user to queue
      */
     public function queueForApproval(User $user): void
     {
@@ -77,8 +79,8 @@ class EmailDomainService
     /**
      * Approve a user account.
      *
-     * @param User $user The user to approve
-     * @param User $admin The admin approving the user
+     * @param  User  $user  The user to approve
+     * @param  User  $admin  The admin approving the user
      */
     public function approveAccount(User $user, User $admin): void
     {
@@ -94,8 +96,8 @@ class EmailDomainService
     /**
      * Reject a user account.
      *
-     * @param User $user The user to reject
-     * @param User $admin The admin rejecting the user
+     * @param  User  $user  The user to reject
+     * @param  User  $admin  The admin rejecting the user
      */
     public function rejectAccount(User $user, User $admin): void
     {

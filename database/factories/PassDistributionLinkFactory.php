@@ -52,4 +52,3 @@ class PassDistributionLinkFactory extends Factory
         });
     }
 }
-

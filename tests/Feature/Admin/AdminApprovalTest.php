@@ -13,7 +13,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin can view pending approvals.
      */
-    public function testAdminCanViewPendingApprovals(): void
+    public function test_admin_can_view_pending_approvals(): void
     {
         $admin = User::factory()->admin()->create();
         $pending = User::factory()->pending()->count(3)->create();
@@ -27,7 +27,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test non-admin cannot view pending approvals.
      */
-    public function testNonAdminCannotViewApprovals(): void
+    public function test_non_admin_cannot_view_approvals(): void
     {
         $user = User::factory()->create(['is_admin' => false]);
 
@@ -39,7 +39,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin can approve a pending user.
      */
-    public function testAdminCanApproveUser(): void
+    public function test_admin_can_approve_user(): void
     {
         Mail::fake();
 
@@ -62,7 +62,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin can reject a pending user.
      */
-    public function testAdminCanRejectUser(): void
+    public function test_admin_can_reject_user(): void
     {
         Mail::fake();
 
@@ -86,7 +86,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin cannot approve an already-approved user.
      */
-    public function testCannotApproveAlreadyApprovedUser(): void
+    public function test_cannot_approve_already_approved_user(): void
     {
         $admin = User::factory()->admin()->create();
         $user = User::factory()->approved()->create();
@@ -101,7 +101,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin can view approved accounts.
      */
-    public function testAdminCanViewApprovedAccounts(): void
+    public function test_admin_can_view_approved_accounts(): void
     {
         $admin = User::factory()->admin()->create();
         User::factory()->approved()->count(5)->create();
@@ -115,7 +115,7 @@ class AdminApprovalTest extends TestCase
     /**
      * Test admin can view rejected accounts.
      */
-    public function testAdminCanViewRejectedAccounts(): void
+    public function test_admin_can_view_rejected_accounts(): void
     {
         $admin = User::factory()->admin()->create();
         User::factory()->create(['approval_status' => 'rejected'])->count(2);

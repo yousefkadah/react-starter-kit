@@ -17,7 +17,7 @@ class OnboardingStepTracker
             'step_key' => $step,
         ]);
 
-        if (!$record->completed_at) {
+        if (! $record->completed_at) {
             $record->markComplete();
         }
     }

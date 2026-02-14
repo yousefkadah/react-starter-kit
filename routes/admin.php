@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminApprovalController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductionApprovalController;
 use Illuminate\Support\Facades\Route;
 

@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
         if ($request->user()) {
             $passLimitService = app(PassLimitService::class);
             $currentPlan = $passLimitService->getCurrentPlan($request->user());
-            $planConfig = config('passkit.plans.' . $currentPlan);
+            $planConfig = config('passkit.plans.'.$currentPlan);
 
             $subscriptionData = [
                 'plan' => $currentPlan,

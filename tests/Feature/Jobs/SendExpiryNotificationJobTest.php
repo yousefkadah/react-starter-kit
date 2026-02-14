@@ -17,7 +17,7 @@ class SendExpiryNotificationJobTest extends TestCase
     /**
      * Test 30-day notification email and flag update.
      */
-    public function testSends30DayNotification(): void
+    public function test_sends30_day_notification(): void
     {
         Mail::fake();
 
@@ -39,7 +39,7 @@ class SendExpiryNotificationJobTest extends TestCase
     /**
      * Test 7-day notification email and flag update.
      */
-    public function testSends7DayNotification(): void
+    public function test_sends7_day_notification(): void
     {
         Mail::fake();
 
@@ -61,7 +61,7 @@ class SendExpiryNotificationJobTest extends TestCase
     /**
      * Test expired notification email and flag update.
      */
-    public function testSendsExpiredNotification(): void
+    public function test_sends_expired_notification(): void
     {
         Mail::fake();
 

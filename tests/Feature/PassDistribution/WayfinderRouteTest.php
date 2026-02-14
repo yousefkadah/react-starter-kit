@@ -11,6 +11,7 @@ use Tests\TestCase;
 class WayfinderRouteTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * Test that Wayfinder passes.show-by-link helper generates correct URL
      */

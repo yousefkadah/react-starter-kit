@@ -18,7 +18,7 @@ class TierProgressionTest extends TestCase
     /**
      * Test user auto-advances to Verified_And_Configured when both certs exist.
      */
-    public function testUserAutoAdvancesWhenBothCertsExist(): void
+    public function test_user_auto_advances_when_both_certs_exist(): void
     {
         Mail::fake();
 
@@ -44,7 +44,7 @@ class TierProgressionTest extends TestCase
     /**
      * Test user does not auto-advance to Production tier.
      */
-    public function testUserDoesNotAutoAdvanceToProduction(): void
+    public function test_user_does_not_auto_advance_to_production(): void
     {
         $user = User::factory()->approved()->create([
             'tier' => 'Verified_And_Configured',
@@ -63,7 +63,7 @@ class TierProgressionTest extends TestCase
     /**
      * Test unapproved user does not advance tiers.
      */
-    public function testUnapprovedUserDoesNotAdvance(): void
+    public function test_unapproved_user_does_not_advance(): void
     {
         $user = User::factory()->pending()->create([
             'tier' => 'Email_Verified',

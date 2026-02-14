@@ -27,7 +27,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test valid Apple certificate is accepted and stored.
      */
-    public function testValidAppleCertificateIsAccepted(): void
+    public function test_valid_apple_certificate_is_accepted(): void
     {
         Storage::fake('certificates');
 
@@ -68,7 +68,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test invalid certificate file is rejected.
      */
-    public function testInvalidCertificateFileIsRejected(): void
+    public function test_invalid_certificate_file_is_rejected(): void
     {
         Storage::fake('certificates');
 
@@ -96,7 +96,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test expired certificate is rejected.
      */
-    public function testExpiredCertificateIsRejected(): void
+    public function test_expired_certificate_is_rejected(): void
     {
         Storage::fake('certificates');
 
@@ -120,7 +120,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test multiple certificates can be uploaded.
      */
-    public function testMultipleCertificatesCanBeUploaded(): void
+    public function test_multiple_certificates_can_be_uploaded(): void
     {
         Storage::fake('certificates');
 
@@ -164,7 +164,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test certificate upload advances user tier.
      */
-    public function testCertificateUploadAdvancesTier(): void
+    public function test_certificate_upload_advances_tier(): void
     {
         Storage::fake('certificates');
 
@@ -193,7 +193,7 @@ class AppleCertificateUploadTest extends TestCase
     /**
      * Test unauthenticated user cannot upload certificate.
      */
-    public function testUnauthenticatedUserCannotUploadCertificate(): void
+    public function test_unauthenticated_user_cannot_upload_certificate(): void
     {
         Storage::fake('certificates');
 
@@ -218,26 +218,26 @@ class AppleCertificateUploadTest extends TestCase
      */
     private function getValidAppleCertificatePem(): string
     {
-        // Self-signed test certificate (valid for 1 year)
-        return <<<'CERT'
------BEGIN CERTIFICATE-----
-MIIDXTCCAkWgAwIBAgIJAKTTqJpJrMVeMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV
-BAYTAlVTMQswCQYDVQQIDAJDQTELMAkGA1UEBwwCQkExDzANBgNVBAoMBkFwcGxl
-MB4XDTI0MDEwMTAwMDAwMFoXDTI1MDEwMTAwMDAwMFowRTELMAkGA1UEBhMCVVMx
-CzAJBgNVBAgMAkNBMQswCQYDVQQHDAJCQTEPMA0GA1UECgwGQXBwbGUwggEiMA0G
-CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDU2OwkJ7BK3o3uKiGgLi4Aw5V3KHCT
-g0oL0VkVlWoN5Q5YZ3vJlJ3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z7Z
-3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7
-Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7
-Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vccAAwEAAaNQME4wHQYDVR0OBBYEFG7Y
-OmX/R3J8xPF/Zm7YQZXzzcgzMB8GA1UdIwQYMBaAFG7YOmX/R3J8xPF/Zm7YQZXz
-zcgzMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJk0O4K8oAz9qPf2
-vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3v
-Z7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3v
-Z7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3v
-Z7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3vZ7Z3v
------END CERTIFICATE-----
-CERT;
+        $privateKey = openssl_pkey_new([
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
+
+        $csr = openssl_csr_new(
+            [
+                'commonName' => 'passkit-test',
+                'organizationName' => 'PassKit Test',
+                'countryName' => 'US',
+            ],
+            $privateKey,
+            ['digest_alg' => 'sha256']
+        );
+
+        $certificate = openssl_csr_sign($csr, null, $privateKey, 3650);
+        $certOut = '';
+        openssl_x509_export($certificate, $certOut);
+
+        return $certOut;
     }
 
     /**

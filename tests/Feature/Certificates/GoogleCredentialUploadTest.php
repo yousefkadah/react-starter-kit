@@ -27,7 +27,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test valid Google JSON credentials are accepted and stored.
      */
-    public function testValidGoogleJsonIsAccepted(): void
+    public function test_valid_google_json_is_accepted(): void
     {
         Storage::fake('certificates');
 
@@ -68,7 +68,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test invalid JSON file is rejected.
      */
-    public function testInvalidJsonIsRejected(): void
+    public function test_invalid_json_is_rejected(): void
     {
         Storage::fake('certificates');
 
@@ -90,7 +90,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test JSON missing required fields is rejected.
      */
-    public function testJsonMissingRequiredFieldsIsRejected(): void
+    public function test_json_missing_required_fields_is_rejected(): void
     {
         Storage::fake('certificates');
 
@@ -118,7 +118,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test JSON with wrong type is rejected.
      */
-    public function testJsonWithWrongTypeIsRejected(): void
+    public function test_json_with_wrong_type_is_rejected(): void
     {
         Storage::fake('certificates');
 
@@ -144,7 +144,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test issuer_id is correctly extracted from client_email.
      */
-    public function testIssuerIdExtractedFromClientEmail(): void
+    public function test_issuer_id_extracted_from_client_email(): void
     {
         Storage::fake('certificates');
 
@@ -172,7 +172,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test multiple credentials can be uploaded.
      */
-    public function testMultipleCredentialsCanBeUploaded(): void
+    public function test_multiple_credentials_can_be_uploaded(): void
     {
         Storage::fake('certificates');
 
@@ -220,7 +220,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test credential upload advances user tier.
      */
-    public function testCredentialUploadAdvancesTier(): void
+    public function test_credential_upload_advances_tier(): void
     {
         Storage::fake('certificates');
 
@@ -249,7 +249,7 @@ class GoogleCredentialUploadTest extends TestCase
     /**
      * Test unauthenticated user cannot upload credentials.
      */
-    public function testUnauthenticatedUserCannotUploadCredentials(): void
+    public function test_unauthenticated_user_cannot_upload_credentials(): void
     {
         Storage::fake('certificates');
 

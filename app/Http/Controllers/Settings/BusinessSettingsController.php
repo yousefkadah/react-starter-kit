@@ -24,12 +24,12 @@ class BusinessSettingsController extends Controller
             ],
             'google' => [
                 'issuer_id' => $request->user()->google_issuer_id,
-                'has_service_account' => !empty($request->user()->google_service_account_json),
+                'has_service_account' => ! empty($request->user()->google_service_account_json),
             ],
             'apple' => [
                 'team_id' => $request->user()->apple_team_id,
                 'pass_type_id' => $request->user()->apple_pass_type_id,
-                'has_certificate' => !empty($request->user()->apple_certificate),
+                'has_certificate' => ! empty($request->user()->apple_certificate),
             ],
         ]);
     }

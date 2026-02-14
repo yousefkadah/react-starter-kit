@@ -19,6 +19,7 @@ class BusinessDomain extends Model
     public function matchesDomain(string $email): bool
     {
         $emailDomain = $this->extractDomainFromEmail($email);
+
         return strtolower($emailDomain) === strtolower($this->domain);
     }
 
@@ -28,6 +29,7 @@ class BusinessDomain extends Model
     protected function extractDomainFromEmail(string $email): string
     {
         $parts = explode('@', $email);
+
         return end($parts) ?? '';
     }
 
@@ -37,6 +39,7 @@ class BusinessDomain extends Model
     public function scopeByEmail($query, string $email)
     {
         $emailDomain = $this->extractDomainFromEmail($email);
+
         return $query->where('domain', $emailDomain);
     }
 }

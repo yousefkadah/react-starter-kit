@@ -18,7 +18,7 @@ class CheckCertificateExpiryJobTest extends TestCase
     /**
      * Test job identifies certificates expiring in 30/7/0 day windows.
      */
-    public function testJobIdentifiesExpiringCertificates(): void
+    public function test_job_identifies_expiring_certificates(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-02-14 00:00:00'));
         Queue::fake();
@@ -30,7 +30,7 @@ class CheckCertificateExpiryJobTest extends TestCase
         $certExpired = AppleCertificate::factory()->for($user)->expired()->create();
         AppleCertificate::factory()->for($user)->expiringIn(90)->create();
 
-        (new CheckCertificateExpiryJob())->handle();
+        (new CheckCertificateExpiryJob)->handle();
 
         Queue::assertPushed(SendExpiryNotificationJob::class, function ($job) use ($cert30) {
             return $job->certificate->is($cert30) && $job->daysRemaining === 30;

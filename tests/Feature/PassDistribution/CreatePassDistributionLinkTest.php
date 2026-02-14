@@ -3,7 +3,6 @@
 namespace Tests\Feature\PassDistribution;
 
 use App\Models\Pass;
-use App\Models\PassDistributionLink;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

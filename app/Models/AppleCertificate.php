@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\ScopedByRegion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\ScopedByRegion;
 
 class AppleCertificate extends Model
 {
-    use HasFactory, SoftDeletes, ScopedByRegion;
+    use HasFactory, ScopedByRegion, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -56,6 +56,7 @@ class AppleCertificate extends Model
     public function isExpiringSoon(): bool
     {
         $daysRemaining = $this->expiry_date->diffInDays(now(), absolute: false);
+
         return $daysRemaining <= 30 && $daysRemaining > 0;
     }
 

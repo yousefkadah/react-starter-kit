@@ -3,23 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SignupRequest;
-use App\Jobs\ValidateEmailDomainJob;
 use App\Jobs\MarkOnboardingStepJob;
+use App\Jobs\ValidateEmailDomainJob;
 use App\Models\OnboardingStep;
 use App\Models\User;
 use App\Services\EmailDomainService;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
     /**
      * Create a new controller instance.
      */
-    public function __construct(private EmailDomainService $emailDomainService)
-    {
-    }
+    public function __construct(private EmailDomainService $emailDomainService) {}
 
     /**
      * Handle user signup/registration.
@@ -107,7 +105,7 @@ class AccountController extends Controller
 
         $user->update(array_filter($validated));
 
-        if (!empty($user->name) && !empty($user->industry)) {
+        if (! empty($user->name) && ! empty($user->industry)) {
             MarkOnboardingStepJob::dispatch($user->id, 'user_profile');
         }
 

@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Events\UserApprovedEvent;
 use App\Events\UserApprovalPendingEvent;
+use App\Events\UserApprovedEvent;
 use App\Mail\UserApprovedMail;
 use App\Mail\UserPendingApprovalMail;
 use App\Models\User;
@@ -22,9 +22,7 @@ class ValidateEmailDomainJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public User $user)
-    {
-    }
+    public function __construct(public User $user) {}
 
     /**
      * Execute the job.

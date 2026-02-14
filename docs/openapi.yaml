@@ -1,0 +1,431 @@
+openapi: 3.0.3
+info:
+  title: Account Creation and Wallet Setup API
+  version: 1.0.0
+  description: API endpoints for account signup, wallet setup, and tier progression.
+servers:
+  - url: /
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+        region:
+          type: string
+          enum: [EU, US]
+        tier:
+          type: string
+        approval_status:
+          type: string
+          enum: [pending, approved, rejected]
+    TierStatus:
+      type: object
+      properties:
+        tier:
+          type: string
+        is_approved:
+          type: boolean
+        can_setup_wallet:
+          type: boolean
+    AppleCertificate:
+      type: object
+      properties:
+        id:
+          type: integer
+        fingerprint:
+          type: string
+        valid_from:
+          type: string
+          format: date-time
+        expiry_date:
+          type: string
+          format: date-time
+    GoogleCredential:
+      type: object
+      properties:
+        id:
+          type: integer
+        issuer_id:
+          type: string
+        project_id:
+          type: string
+        last_rotated_at:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+paths:
+  /api/signup:
+    post:
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation, region, industry, agree_terms]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                password_confirmation:
+                  type: string
+                region:
+                  type: string
+                  enum: [EU, US]
+                industry:
+                  type: string
+                agree_terms:
+                  type: boolean
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/account:
+    get:
+      summary: Get account settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Account settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  tier:
+                    type: string
+                  is_approved:
+                    type: boolean
+                  can_setup_wallet:
+                    type: boolean
+                  onboarding_steps:
+                    type: array
+                    items:
+                      type: object
+        '403':
+          description: Forbidden
+    put:
+      summary: Update account settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                industry:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+  /api/certificates/apple/csr:
+    get:
+      summary: Download Apple CSR
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: CSR file download
+  /api/certificates/apple:
+    post:
+      summary: Upload Apple certificate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [certificate]
+              properties:
+                certificate:
+                  type: string
+                  format: binary
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Certificate uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  certificate:
+                    $ref: '#/components/schemas/AppleCertificate'
+        '422':
+          description: Validation error
+  /api/certificates/apple/{certificate}:
+    delete:
+      summary: Delete Apple certificate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: certificate
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+  /api/certificates/apple/{certificate}/renew:
+    get:
+      summary: Generate renewal CSR
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: certificate
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: CSR file download
+  /api/certificates/google:
+    post:
+      summary: Upload Google credentials JSON
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [credentials]
+              properties:
+                credentials:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Credentials uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  credential:
+                    $ref: '#/components/schemas/GoogleCredential'
+        '422':
+          description: Validation error
+  /api/certificates/google/{credential}:
+    delete:
+      summary: Delete Google credentials
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: credential
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+  /api/certificates/google/{credential}/rotate:
+    get:
+      summary: Send rotation instructions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: credential
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Instructions sent
+  /api/tier/request-production:
+    post:
+      summary: Request production tier
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Request accepted
+        '422':
+          description: Cannot request
+  /api/tier/request-live:
+    post:
+      summary: Validate pre-launch checklist
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tested_on_device:
+                  type: boolean
+      responses:
+        '200':
+          description: Checklist validated
+        '422':
+          description: Checklist incomplete
+  /api/tier/go-live:
+    post:
+      summary: Go live
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Live approved
+        '422':
+          description: Cannot go live
+  /admin/approvals:
+    get:
+      summary: List account approval requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Approval queue
+  /admin/approvals/{user}/approve:
+    post:
+      summary: Approve account
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Approved
+  /admin/approvals/{user}/reject:
+    post:
+      summary: Reject account
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Rejected
+  /admin/production-requests:
+    get:
+      summary: List production tier requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Production request queue
+  /admin/production-requests/{user}/approve:
+    post:
+      summary: Approve production tier
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Approved
+  /admin/production-requests/{user}/reject:
+    post:
+      summary: Reject production tier
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Rejected

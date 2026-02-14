@@ -48,6 +48,7 @@ class TierProgressionService
         if ($user->tier === 'Email_Verified' && $hasAppleCertificate && $hasGoogleCredential) {
             $user->update(['tier' => 'Verified_And_Configured']);
             $this->dispatchTierAdvancedEvent($user, $oldTier, 'Verified_And_Configured');
+
             return;
         }
 
@@ -90,7 +91,7 @@ class TierProgressionService
      */
     public function submitProductionRequest(User $user): void
     {
-        if (!$this->canRequestProduction($user)) {
+        if (! $this->canRequestProduction($user)) {
             throw new \Exception('User cannot request production tier at this time.');
         }
 
@@ -188,7 +189,7 @@ class TierProgressionService
             throw new \Exception('User must be in Production tier to advance to live.');
         }
 
-        if (!$this->validatePreLaunchChecklist($user)) {
+        if (! $this->validatePreLaunchChecklist($user)) {
             throw new \Exception('Pre-launch checklist requirements not met.');
         }
 
@@ -224,7 +225,7 @@ class TierProgressionService
             ->where('expiry_date', '>', now())
             ->exists();
 
-        if (!$hasAppleCertificate) {
+        if (! $hasAppleCertificate) {
             return false;
         }
 
@@ -233,19 +234,19 @@ class TierProgressionService
             ->whereNull('deleted_at')
             ->exists();
 
-        if (!$hasGoogleCredential) {
+        if (! $hasGoogleCredential) {
             return false;
         }
 
         // 3. At least 1 pass created by user
         // (assuming user has many passes through a relationship)
-        if (!method_exists($user, 'passes') || !$user->passes()->exists()) {
+        if (! method_exists($user, 'passes') || ! $user->passes()->exists()) {
             return false;
         }
 
         // 4. Tested on device (check pre_launch_checklist JSON or column)
         $checklist = $user->pre_launch_checklist ?? [];
-        if (!isset($checklist['tested_on_device']) || !$checklist['tested_on_device']) {
+        if (! isset($checklist['tested_on_device']) || ! $checklist['tested_on_device']) {
             return false;
         }
 

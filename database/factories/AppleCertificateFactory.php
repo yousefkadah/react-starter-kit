@@ -22,7 +22,7 @@ class AppleCertificateFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'path' => 'wwdr-' . fake()->uuid() . '.cer',
+            'path' => 'wwdr-'.fake()->uuid().'.cer',
             'password' => encrypt(fake()->password()),
             'valid_from' => $validFrom,
             'expiry_date' => $expiryDate,

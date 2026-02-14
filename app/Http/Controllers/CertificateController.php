@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\TierProgressionJob;
 use App\Jobs\MarkOnboardingStepsForWalletJob;
+use App\Jobs\TierProgressionJob;
+use App\Mail\CertificateRenewalMail;
 use App\Models\AppleCertificate;
 use App\Models\GoogleCredential;
-use App\Models\User;
 use App\Services\AppleCSRService;
 use App\Services\CertificateValidationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Crypt;
 class CertificateController extends Controller
 {
     protected AppleCSRService $csrService;
+
     protected CertificateValidationService $validationService;
 
     public function __construct(
@@ -28,7 +29,6 @@ class CertificateController extends Controller
     ) {
         $this->csrService = $csrService;
         $this->validationService = $validationService;
-        $this->middleware('auth:sanctum');
     }
 
     /**
@@ -57,7 +57,7 @@ class CertificateController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to generate CSR: ' . $e->getMessage(),
+                'message' => 'Failed to generate CSR: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -65,7 +65,6 @@ class CertificateController extends Controller
     /**
      * Upload Apple Wallet certificate (.cer file)
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function uploadAppleCertificate(Request $request)
@@ -82,7 +81,7 @@ class CertificateController extends Controller
         // Validate certificate
         $validation = $this->validationService->validateAppleCertificate($file);
 
-        if (!$validation['valid']) {
+        if (! $validation['valid']) {
             return response()->json([
                 'message' => 'Certificate validation failed',
                 'errors' => $validation['errors'],
@@ -97,7 +96,7 @@ class CertificateController extends Controller
             // Create AppleCertificate record
             $certificate = AppleCertificate::create([
                 'user_id' => $user->id,
-                'path' => 'certificates/apple/' . uniqid() . '.cer',
+                'path' => 'certificates/apple/'.uniqid().'.cer',
                 'password' => $encryptedPassword,
                 'valid_from' => $validation['valid_from'],
                 'expiry_date' => $validation['expiry_date'],
@@ -121,7 +120,7 @@ class CertificateController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to store certificate: ' . $e->getMessage(),
+                'message' => 'Failed to store certificate: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -129,7 +128,6 @@ class CertificateController extends Controller
     /**
      * Upload Google Wallet service account JSON
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function uploadGoogleCredential(Request $request)
@@ -145,7 +143,7 @@ class CertificateController extends Controller
         // Validate Google credentials
         $validation = $this->validationService->validateGoogleJSON($file);
 
-        if (!$validation['valid']) {
+        if (! $validation['valid']) {
             return response()->json([
                 'message' => 'Credentials validation failed',
                 'errors' => $validation['errors'],
@@ -182,7 +180,7 @@ class CertificateController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to store credentials: ' . $e->getMessage(),
+                'message' => 'Failed to store credentials: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -190,7 +188,6 @@ class CertificateController extends Controller
     /**
      * Delete Apple certificate
      *
-     * @param AppleCertificate $certificate
      * @return JsonResponse
      */
     public function deleteAppleCertificate(AppleCertificate $certificate)
@@ -214,7 +211,6 @@ class CertificateController extends Controller
     /**
      * Delete Google credential
      *
-     * @param GoogleCredential $credential
      * @return JsonResponse
      */
     public function deleteGoogleCredential(GoogleCredential $credential)
@@ -238,7 +234,6 @@ class CertificateController extends Controller
     /**
      * Renew Apple certificate (generate new CSR)
      *
-     * @param AppleCertificate $certificate
      * @return JsonResponse|\Illuminate\Http\Response
      */
     public function renewAppleCertificate(AppleCertificate $certificate)
@@ -257,22 +252,19 @@ class CertificateController extends Controller
             $csr = $this->csrService->generateCSR($user);
 
             // Send email with renewal instructions
-            \Illuminate\Support\Facades\Mail::raw(
-                "Your certificate (Fingerprint: {$certificate->fingerprint}) is expiring soon.\n\n" .
-                "Here's a new Certificate Signing Request (CSR) for renewal.\n\n" .
-                $this->csrService->getAppleInstructions(),
-                function ($message) use ($user) {
-                    $message
-                        ->to($user->email)
-                        ->subject('Your Apple Wallet Certificate Renewal Request');
-                }
-            );
+            \Illuminate\Support\Facades\Mail::to($user->email)
+                ->send(new CertificateRenewalMail(
+                    $user,
+                    $certificate,
+                    $csr,
+                    $this->csrService->getAppleInstructions()
+                ));
 
             return $this->csrService->downloadCSR($csr);
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to generate renewal CSR: ' . $e->getMessage(),
+                'message' => 'Failed to generate renewal CSR: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -281,7 +273,6 @@ class CertificateController extends Controller
      * Rotate Google credentials (generate new key)
      * Note: This requires manual rotation on Google Cloud console
      *
-     * @param GoogleCredential $credential
      * @return JsonResponse
      */
     public function rotateGoogleCredential(GoogleCredential $credential)
@@ -297,13 +288,13 @@ class CertificateController extends Controller
 
         // Send email with rotation instructions
         \Illuminate\Support\Facades\Mail::raw(
-            "Your Google Wallet credentials should be rotated periodically for security.\n\n" .
-            "To rotate your credentials:\n\n" .
-            "1. Log into Google Cloud Console\n" .
-            "2. Navigate to Service Accounts\n" .
-            "3. Select the 'passkit' service account\n" .
-            "4. Go to the 'Keys' tab\n" .
-            "5. Create a new JSON key\n" .
+            "Your Google Wallet credentials should be rotated periodically for security.\n\n".
+            "To rotate your credentials:\n\n".
+            "1. Log into Google Cloud Console\n".
+            "2. Navigate to Service Accounts\n".
+            "3. Select the 'passkit' service account\n".
+            "4. Go to the 'Keys' tab\n".
+            "5. Create a new JSON key\n".
             "6. Download and upload it here\n",
             function ($message) use ($user) {
                 $message

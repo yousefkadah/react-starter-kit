@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Jobs;
 
-use App\Services\OnboardingStepTracker;
 use App\Models\User;
+use App\Services\OnboardingStepTracker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +14,7 @@ class OnboardingStepTrackerTest extends TestCase
     /**
      * Test steps are marked complete and allStepsComplete returns true.
      */
-    public function testMarksStepsComplete(): void
+    public function test_marks_steps_complete(): void
     {
         $user = User::factory()->approved()->create();
         $tracker = app(OnboardingStepTracker::class);

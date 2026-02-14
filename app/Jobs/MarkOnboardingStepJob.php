@@ -20,8 +20,7 @@ class MarkOnboardingStepJob implements ShouldQueue
     public function __construct(
         public int $userId,
         public string $stepKey
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -29,7 +28,7 @@ class MarkOnboardingStepJob implements ShouldQueue
     public function handle(): void
     {
         $user = User::find($this->userId);
-        if (!$user) {
+        if (! $user) {
             return;
         }
 

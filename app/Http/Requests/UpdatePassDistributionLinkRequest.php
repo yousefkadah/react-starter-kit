@@ -35,5 +35,3 @@ class UpdatePassDistributionLinkRequest extends FormRequest
         ];
     }
 }
-
-

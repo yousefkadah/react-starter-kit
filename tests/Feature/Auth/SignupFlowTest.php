@@ -23,7 +23,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test signup with business email auto-approves.
      */
-    public function testSignupWithBusinessEmailAutoApproves(): void
+    public function test_signup_with_business_email_auto_approves(): void
     {
         Mail::fake();
 
@@ -51,7 +51,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test signup with consumer email queues for approval.
      */
-    public function testSignupWithConsumerEmailQueuesForApproval(): void
+    public function test_signup_with_consumer_email_queues_for_approval(): void
     {
         Mail::fake();
 
@@ -79,7 +79,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test validation fails without required fields.
      */
-    public function testSignupValidationErrors(): void
+    public function test_signup_validation_errors(): void
     {
         $response = $this->postJson('/api/signup', [
             'name' => 'John Doe',
@@ -97,7 +97,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test password validation.
      */
-    public function testSignupPasswordValidation(): void
+    public function test_signup_password_validation(): void
     {
         $response = $this->postJson('/api/signup', [
             'name' => 'John Doe',
@@ -115,7 +115,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test region is required.
      */
-    public function testSignupRegionRequired(): void
+    public function test_signup_region_required(): void
     {
         $response = $this->postJson('/api/signup', [
             'name' => 'John Doe',
@@ -133,7 +133,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test duplicate email validation.
      */
-    public function testSignupDuplicateEmailFails(): void
+    public function test_signup_duplicate_email_fails(): void
     {
         $existing = User::factory()->create(['email' => 'existing@example.com']);
 
@@ -153,7 +153,7 @@ class SignupFlowTest extends TestCase
     /**
      * Test onboarding steps are created.
      */
-    public function testOnboardingStepsCreated(): void
+    public function test_onboarding_steps_created(): void
     {
         Mail::fake();
 

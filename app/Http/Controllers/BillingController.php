@@ -64,8 +64,8 @@ class BillingController extends Controller
         return $request->user()
             ->newSubscription('default', $validated['price_id'])
             ->checkout([
-                'success_url' => route('billing.index') . '?success=true',
-                'cancel_url' => route('billing.index') . '?canceled=true',
+                'success_url' => route('billing.index').'?success=true',
+                'cancel_url' => route('billing.index').'?canceled=true',
             ]);
     }
 

@@ -21,8 +21,7 @@ class SendExpiryNotificationJob implements ShouldQueue
     public function __construct(
         public AppleCertificate $certificate,
         public int $daysRemaining
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.

@@ -21,8 +21,7 @@ class CertificateExpiryMail extends Mailable
         public User $user,
         public AppleCertificate $certificate,
         public int $daysRemaining
-    ) {
-    }
+    ) {}
 
     /**
      * Get the message envelope.
@@ -50,7 +49,7 @@ class CertificateExpiryMail extends Mailable
                 'user' => $this->user,
                 'certificate' => $this->certificate,
                 'daysRemaining' => $this->daysRemaining,
-                'manageUrl' => config('app.url') . '/settings/certificates/apple',
+                'manageUrl' => config('app.url').'/settings/certificates/apple',
             ],
         );
     }

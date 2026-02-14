@@ -56,6 +56,7 @@ class SignupRequest extends FormRequest
     public function getApprovalStatus(): string
     {
         $service = app(EmailDomainService::class);
+
         return $service->getApprovalStatus($this->email);
     }
 
@@ -65,6 +66,7 @@ class SignupRequest extends FormRequest
     public function getDomain(): string
     {
         $service = app(EmailDomainService::class);
+
         return $service->extractDomain($this->email);
     }
 }

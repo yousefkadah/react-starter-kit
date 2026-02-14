@@ -25,17 +25,17 @@ class EnforcePassLimit
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
         $platform = $request->input('platform');
 
-        if (!$platform) {
+        if (! $platform) {
             return $next($request);
         }
 
-        if (!$this->passLimitService->canCreatePass($user, $platform)) {
+        if (! $this->passLimitService->canCreatePass($user, $platform)) {
             return back()->withErrors([
                 'limit' => 'You have reached your pass creation limit. Please upgrade your plan to create more passes.',
             ]);

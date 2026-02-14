@@ -17,9 +17,7 @@ class MarkOnboardingStepsForWalletJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public int $userId)
-    {
-    }
+    public function __construct(public int $userId) {}
 
     /**
      * Execute the job.
@@ -27,7 +25,7 @@ class MarkOnboardingStepsForWalletJob implements ShouldQueue
     public function handle(): void
     {
         $user = User::find($this->userId);
-        if (!$user) {
+        if (! $user) {
             return;
         }
 

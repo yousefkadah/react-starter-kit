@@ -14,7 +14,7 @@ trait ScopedByRegion
         static::addGlobalScope('region', function (Builder $builder) {
             $user = auth()->user();
 
-            if (!$user || $user->is_admin) {
+            if (! $user || $user->is_admin) {
                 return;
             }
 
@@ -24,6 +24,7 @@ trait ScopedByRegion
             $hasRegionColumn = self::$regionScopeCache[$table] ??= Schema::hasColumn($table, 'region');
             if ($hasRegionColumn) {
                 $builder->where("{$table}.region", $user->region);
+
                 return;
             }
 

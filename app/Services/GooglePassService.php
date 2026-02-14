@@ -9,23 +9,26 @@ use RuntimeException;
 class GooglePassService
 {
     protected array $serviceAccount;
+
     protected string $issuerId;
+
     protected string $applicationName;
+
     protected string $baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
 
     public function __construct()
     {
         $serviceAccountPath = config('passkit.google.service_account_path');
 
-        if (!$serviceAccountPath || !file_exists($serviceAccountPath)) {
-            throw new RuntimeException("Google service account file not found");
+        if (! $serviceAccountPath || ! file_exists($serviceAccountPath)) {
+            throw new RuntimeException('Google service account file not found');
         }
 
         $content = file_get_contents($serviceAccountPath);
         $this->serviceAccount = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException("Invalid service account JSON: " . json_last_error_msg());
+            throw new RuntimeException('Invalid service account JSON: '.json_last_error_msg());
         }
 
         $this->issuerId = config('passkit.google.issuer_id');
@@ -35,8 +38,8 @@ class GooglePassService
     /**
      * Generate a Google Wallet save URL for the given pass.
      *
-     * @param Pass $pass
      * @return string The save URL
+     *
      * @throws RuntimeException
      */
     public function generate(Pass $pass): string
@@ -69,7 +72,6 @@ class GooglePassService
     /**
      * Get OAuth2 access token using service account.
      *
-     * @return string
      * @throws RuntimeException
      */
     protected function getAccessToken(): string
@@ -97,8 +99,8 @@ class GooglePassService
             'assertion' => $jwt,
         ]);
 
-        if (!$response->successful()) {
-            throw new RuntimeException("Failed to get access token: " . $response->body());
+        if (! $response->successful()) {
+            throw new RuntimeException('Failed to get access token: '.$response->body());
         }
 
         return $response->json()['access_token'];
@@ -107,8 +109,8 @@ class GooglePassService
     /**
      * Ensure the pass class exists, create if not.
      *
-     * @param Pass $pass
      * @return string The class ID
+     *
      * @throws RuntimeException
      */
     protected function ensurePassClass(Pass $pass): string
@@ -134,22 +136,18 @@ class GooglePassService
             $createResponse = Http::withToken($accessToken)
                 ->post("{$this->baseUrl}/{$classEndpoint}", $classData);
 
-            if (!$createResponse->successful()) {
-                throw new RuntimeException("Failed to create pass class: " . $createResponse->body());
+            if (! $createResponse->successful()) {
+                throw new RuntimeException('Failed to create pass class: '.$createResponse->body());
             }
 
             return $classId;
         }
 
-        throw new RuntimeException("Failed to check pass class: " . $response->body());
+        throw new RuntimeException('Failed to check pass class: '.$response->body());
     }
 
     /**
      * Build pass class data.
-     *
-     * @param Pass $pass
-     * @param string $classId
-     * @return array
      */
     protected function buildPassClass(Pass $pass, string $classId): array
     {
@@ -173,10 +171,10 @@ class GooglePassService
             case 'storeCard':
             case 'stampCard':
                 $classData['programName'] = $passData['description'] ?? 'Loyalty Program';
-                if (!empty($passData['logo'])) {
+                if (! empty($passData['logo'])) {
                     $classData['programLogo'] = [
                         'sourceUri' => [
-                            'uri' => asset('storage/' . $passData['logo']),
+                            'uri' => asset('storage/'.$passData['logo']),
                         ],
                     ];
                 }
@@ -225,10 +223,6 @@ class GooglePassService
 
     /**
      * Build pass object data.
-     *
-     * @param Pass $pass
-     * @param string $classId
-     * @return array
      */
     protected function buildPassObject(Pass $pass, string $classId): array
     {
@@ -242,19 +236,19 @@ class GooglePassService
         ];
 
         // Add barcode if present
-        if (!empty($barcodeData) && is_array($barcodeData)) {
+        if (! empty($barcodeData) && is_array($barcodeData)) {
             $objectData['barcode'] = [
                 'type' => $this->convertBarcodeFormat($barcodeData['format'] ?? 'PKBarcodeFormatQR'),
                 'value' => $barcodeData['message'] ?? '',
             ];
 
-            if (!empty($barcodeData['altText'])) {
+            if (! empty($barcodeData['altText'])) {
                 $objectData['barcode']['alternateText'] = $barcodeData['altText'];
             }
         }
 
         // Add text modules from primaryFields
-        if (!empty($passData['primaryFields']) && is_array($passData['primaryFields'])) {
+        if (! empty($passData['primaryFields']) && is_array($passData['primaryFields'])) {
             $objectData['textModulesData'] = [];
             foreach ($passData['primaryFields'] as $index => $field) {
                 $objectData['textModulesData'][] = [
@@ -266,10 +260,10 @@ class GooglePassService
         }
 
         // Add hero image if available
-        if (!empty($pass->images['strip']) && is_array($pass->images)) {
+        if (! empty($pass->images['strip']) && is_array($pass->images)) {
             $objectData['heroImage'] = [
                 'sourceUri' => [
-                    'uri' => asset('storage/' . $pass->images['strip']),
+                    'uri' => asset('storage/'.$pass->images['strip']),
                 ],
             ];
         }
@@ -279,10 +273,6 @@ class GooglePassService
 
     /**
      * Generate JWT for save URL.
-     *
-     * @param string $passType
-     * @param array $objectData
-     * @return string
      */
     protected function generateSaveJwt(string $passType, array $objectData): string
     {
@@ -312,9 +302,6 @@ class GooglePassService
     /**
      * Encode JWT with RS256 algorithm.
      *
-     * @param array $header
-     * @param array $payload
-     * @return string
      * @throws RuntimeException
      */
     protected function encodeJwt(array $header, array $payload): string
@@ -325,7 +312,7 @@ class GooglePassService
 
         $privateKey = openssl_pkey_get_private($this->serviceAccount['private_key']);
         if ($privateKey === false) {
-            throw new RuntimeException("Failed to read private key: " . openssl_error_string());
+            throw new RuntimeException('Failed to read private key: '.openssl_error_string());
         }
 
         $signature = '';
@@ -333,8 +320,8 @@ class GooglePassService
 
         openssl_pkey_free($privateKey);
 
-        if (!$signResult) {
-            throw new RuntimeException("Failed to sign JWT: " . openssl_error_string());
+        if (! $signResult) {
+            throw new RuntimeException('Failed to sign JWT: '.openssl_error_string());
         }
 
         $signatureEncoded = $this->base64UrlEncode($signature);
@@ -344,9 +331,6 @@ class GooglePassService
 
     /**
      * Base64 URL encode.
-     *
-     * @param string $data
-     * @return string
      */
     protected function base64UrlEncode(string $data): string
     {
@@ -355,9 +339,6 @@ class GooglePassService
 
     /**
      * Convert Apple barcode format to Google format.
-     *
-     * @param string $appleFormat
-     * @return string
      */
     protected function convertBarcodeFormat(string $appleFormat): string
     {
@@ -373,9 +354,6 @@ class GooglePassService
 
     /**
      * Get the class endpoint for the pass type.
-     *
-     * @param string $passType
-     * @return string
      */
     protected function getClassEndpoint(string $passType): string
     {
@@ -396,9 +374,6 @@ class GooglePassService
 
     /**
      * Get the object key for the pass type in JWT payload.
-     *
-     * @param string $passType
-     * @return string
      */
     protected function getObjectKey(string $passType): string
     {

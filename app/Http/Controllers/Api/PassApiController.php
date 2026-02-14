@@ -39,13 +39,13 @@ class PassApiController extends Controller
         $user = $request->user();
 
         // Check if user can create more passes
-        if (!$this->passLimitService->canCreatePass($user, ['apple', 'google'])) {
+        if (! $this->passLimitService->canCreatePass($user, ['apple', 'google'])) {
             return response()->json([
                 'error' => 'Pass limit reached',
                 'message' => 'You have reached your pass creation limit. Please upgrade your plan.',
                 'current_plan' => $this->passLimitService->getCurrentPlan($user),
                 'pass_count' => $user->passes()->count(),
-                'pass_limit' => config('passkit.plans.' . $this->passLimitService->getCurrentPlan($user) . '.pass_limit'),
+                'pass_limit' => config('passkit.plans.'.$this->passLimitService->getCurrentPlan($user).'.pass_limit'),
             ], 403);
         }
 
@@ -146,7 +146,7 @@ class PassApiController extends Controller
         $json = json_encode($data);
 
         foreach ($customFields as $key => $value) {
-            $json = str_replace("{{" . $key . "}}", $value, $json);
+            $json = str_replace('{{'.$key.'}}', $value, $json);
         }
 
         return json_decode($json, true);

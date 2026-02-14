@@ -16,9 +16,7 @@ class AdminProductionRequestMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user)
-    {
-    }
+    public function __construct(public User $user) {}
 
     /**
      * Get the message envelope.
@@ -26,7 +24,7 @@ class AdminProductionRequestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Production Tier Request: ' . $this->user->name,
+            subject: 'New Production Tier Request: '.$this->user->name,
         );
     }
 

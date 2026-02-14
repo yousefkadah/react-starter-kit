@@ -20,7 +20,7 @@ class ProductionApprovalTest extends TestCase
     /**
      * Test user can request production tier.
      */
-    public function testUserCanRequestProduction(): void
+    public function test_user_can_request_production(): void
     {
         Mail::fake();
 
@@ -46,7 +46,7 @@ class ProductionApprovalTest extends TestCase
     /**
      * Test admin can approve production tier request.
      */
-    public function testAdminCanApproveProductionRequest(): void
+    public function test_admin_can_approve_production_request(): void
     {
         Mail::fake();
 
@@ -74,7 +74,7 @@ class ProductionApprovalTest extends TestCase
     /**
      * Test admin can reject production tier request.
      */
-    public function testAdminCanRejectProductionRequest(): void
+    public function test_admin_can_reject_production_request(): void
     {
         Mail::fake();
 

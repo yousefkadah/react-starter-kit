@@ -14,7 +14,7 @@ class RegionScopingTest extends TestCase
     /**
      * Test users only see passes in their region.
      */
-    public function testUserOnlySeesPassesInTheirRegion(): void
+    public function test_user_only_sees_passes_in_their_region(): void
     {
         $euUser = User::factory()->approved()->create(['region' => 'EU']);
         $usUser = User::factory()->approved()->create(['region' => 'US']);
@@ -32,7 +32,7 @@ class RegionScopingTest extends TestCase
     /**
      * Test admin can see passes across regions.
      */
-    public function testAdminCanSeeAllRegions(): void
+    public function test_admin_can_see_all_regions(): void
     {
         $admin = User::factory()->admin()->create(['region' => 'EU']);
         $euUser = User::factory()->approved()->create(['region' => 'EU']);

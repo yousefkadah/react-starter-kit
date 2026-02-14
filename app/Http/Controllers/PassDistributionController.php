@@ -13,9 +13,7 @@ use Inertia\Inertia;
 
 class PassDistributionController extends Controller
 {
-    public function __construct(private PassDistributionLinkService $service)
-    {
-    }
+    public function __construct(private PassDistributionLinkService $service) {}
 
     /**
      * Display the specified pass distribution link (public endpoint).
@@ -137,5 +135,3 @@ class PassDistributionController extends Controller
         };
     }
 }
-
-

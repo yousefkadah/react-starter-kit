@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\ScopedByRegion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\ScopedByRegion;
 
 class GoogleCredential extends Model
 {
-    use HasFactory, SoftDeletes, ScopedByRegion;
+    use HasFactory, ScopedByRegion, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -46,6 +46,7 @@ class GoogleCredential extends Model
             // Extract the issuer ID from client_email (e.g., "passkit-service@project.iam.gserviceaccount.com")
             return explode('@', $data['client_email'])[0];
         }
+
         return '';
     }
 
@@ -54,9 +55,10 @@ class GoogleCredential extends Model
      */
     public function isRecent(): bool
     {
-        if (!$this->last_rotated_at) {
+        if (! $this->last_rotated_at) {
             return false;
         }
+
         return $this->last_rotated_at->diffInDays(now()) <= 90;
     }
 }

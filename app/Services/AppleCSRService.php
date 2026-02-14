@@ -13,8 +13,8 @@ class AppleCSRService
     /**
      * Generate a Certificate Signing Request (CSR) for Apple Wallet
      *
-     * @param User $user
      * @return string PEM-formatted CSR content
+     *
      * @throws \Exception If CSR generation fails
      */
     public function generateCSR(User $user): string
@@ -36,14 +36,14 @@ class AppleCSRService
         ]);
 
         if ($privateKey === false) {
-            throw new \Exception('Failed to generate private key: ' . openssl_error_string());
+            throw new \Exception('Failed to generate private key: '.openssl_error_string());
         }
 
         // Generate CSR
         $csr = openssl_csr_new($subject, $privateKey);
 
         if ($csr === false) {
-            throw new \Exception('Failed to generate CSR: ' . openssl_error_string());
+            throw new \Exception('Failed to generate CSR: '.openssl_error_string());
         }
 
         // Export CSR to PEM format
@@ -60,8 +60,7 @@ class AppleCSRService
     /**
      * Download CSR as file
      *
-     * @param string $csrContent PEM-formatted CSR
-     * @return \Illuminate\Http\Response
+     * @param  string  $csrContent  PEM-formatted CSR
      */
     public function downloadCSR(string $csrContent): \Illuminate\Http\Response
     {

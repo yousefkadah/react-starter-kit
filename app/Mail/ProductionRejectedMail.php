@@ -19,8 +19,7 @@ class ProductionRejectedMail extends Mailable
     public function __construct(
         public User $user,
         public string $reason
-    ) {
-    }
+    ) {}
 
     /**
      * Get the message envelope.

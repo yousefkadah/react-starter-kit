@@ -15,6 +15,7 @@ class StorePassDistributionLinkRequest extends FormRequest
         $passId = $this->route('pass');
         // Handle both object (from route model binding) and ID (from tests)
         $pass = $passId instanceof Pass ? $passId : Pass::findOrFail($passId);
+
         return $this->user()->can('createDistributionLink', $pass);
     }
 
@@ -30,5 +31,3 @@ class StorePassDistributionLinkRequest extends FormRequest
         ];
     }
 }
-
-

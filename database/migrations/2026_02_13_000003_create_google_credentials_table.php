@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string('issuer_id')->comment('Google Wallet issuer ID extracted from service account');
             $table->text('private_key')->encrypted()->comment('Encrypted Google service account private key');
             $table->string('project_id')->comment('Google Cloud project ID');
-            
+
             // Rotation tracking
             $table->timestamp('last_rotated_at')->nullable()->comment('Last credential rotation timestamp');
-            
+
             $table->softDeletes();
             $table->timestamps();
-            
+
             // Indexes
             $table->index('user_id');
             $table->index('issuer_id');

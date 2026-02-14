@@ -14,9 +14,7 @@ class AdminApprovalController extends Controller
     /**
      * Create a new controller instance.
      */
-    public function __construct(private EmailDomainService $emailDomainService)
-    {
-    }
+    public function __construct(private EmailDomainService $emailDomainService) {}
 
     /**
      * Get pending approval queue.

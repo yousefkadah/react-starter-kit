@@ -19,8 +19,7 @@ class TierAdvancedMail extends Mailable
     public function __construct(
         public User $user,
         public string $newTier
-    ) {
-    }
+    ) {}
 
     /**
      * Get the message envelope.

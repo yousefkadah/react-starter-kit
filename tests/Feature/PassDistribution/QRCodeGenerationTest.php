@@ -55,4 +55,3 @@ class QRCodeGenerationTest extends TestCase
         $this->assertNotEquals($link1->url(), $link2->url());
     }
 }
-

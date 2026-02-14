@@ -62,6 +62,7 @@ class OnboardingStep extends Model
     {
         $this->completed_at = now();
         $this->save();
+
         return $this;
     }
 }

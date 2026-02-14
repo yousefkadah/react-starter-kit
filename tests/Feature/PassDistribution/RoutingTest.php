@@ -11,6 +11,7 @@ use Tests\TestCase;
 class RoutingTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * Test that named routes resolve correctly
      */

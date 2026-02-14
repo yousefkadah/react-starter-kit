@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\User;
 use App\Policies\AccountSettingsPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
