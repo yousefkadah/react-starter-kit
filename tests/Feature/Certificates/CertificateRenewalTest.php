@@ -85,12 +85,12 @@ class CertificateRenewalTest extends TestCase
         $oldCertId = $this->certificate->id;
 
         $certContent = $this->getValidAppleCertificatePem();
-        
+
         // Create a temporary file with the certificate content
         $tempFile = tmpfile();
         $tempPath = stream_get_meta_data($tempFile)['uri'];
         fwrite($tempFile, $certContent);
-        
+
         $file = new \Illuminate\Http\UploadedFile(
             $tempPath,
             'certificate.cer',
@@ -113,7 +113,7 @@ class CertificateRenewalTest extends TestCase
 
         $this->assertNotNull($newCert);
         $this->assertNotEquals($oldCertId, $newCert->id);
-        
+
         fclose($tempFile);
     }
 
