@@ -21,6 +21,7 @@ class AppleCertificateUploadTest extends TestCase
 
         $this->user = User::factory()->approved()->create([
             'tier' => 'Email_Verified',
+            'region' => 'US',
         ]);
     }
 

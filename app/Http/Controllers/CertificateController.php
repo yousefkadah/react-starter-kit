@@ -146,7 +146,9 @@ class CertificateController extends Controller
         if (! $validation['valid']) {
             return response()->json([
                 'message' => 'Credentials validation failed',
-                'errors' => $validation['errors'],
+                'errors' => [
+                    'credentials' => $validation['errors'],
+                ],
             ], 422);
         }
 

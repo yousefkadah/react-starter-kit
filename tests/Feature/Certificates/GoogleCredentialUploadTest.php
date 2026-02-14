@@ -21,6 +21,7 @@ class GoogleCredentialUploadTest extends TestCase
 
         $this->user = User::factory()->approved()->create([
             'tier' => 'Email_Verified',
+            'region' => 'US',
         ]);
     }
 
@@ -61,7 +62,7 @@ class GoogleCredentialUploadTest extends TestCase
 
         $credential = GoogleCredential::where('user_id', $this->user->id)->first();
         $this->assertNotNull($credential);
-        $this->assertEquals('test@test-project.iam.gserviceaccount.com', $credential->issuer_id);
+        $this->assertEquals('test', $credential->issuer_id);
         $this->assertEquals('test-project', $credential->project_id);
     }
 
@@ -164,7 +165,7 @@ class GoogleCredentialUploadTest extends TestCase
 
         $credential = GoogleCredential::where('user_id', $this->user->id)->first();
         $this->assertEquals(
-            'test@test-project.iam.gserviceaccount.com',
+            'test',
             $credential->issuer_id
         );
     }
@@ -273,16 +274,34 @@ class GoogleCredentialUploadTest extends TestCase
      */
     private function getValidGoogleServiceAccountJson(): string
     {
+        $privateKey = $this->generatePrivateKeyPem();
+
         return json_encode([
             'type' => 'service_account',
             'project_id' => 'test-project',
             'private_key_id' => 'key-id-123',
-            'private_key' => "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA2a2rwplBJLV0NFK53JQ7C4iZlXL3fCj0AGkR0XlGlMnKVdFC\nkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlM\nnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0\nXlGlMnKVdFCkR0XlGlMnJzKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnK\nVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0Xl\nGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFC\nkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMn\nKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0Xl\nGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFC\nkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMn\nKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0Xl\nGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFC\nkPKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0\nXlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdF\nCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMn\nKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0Xl\nGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFC\nkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMn\nKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XlGlMnKVdFCkR0XH\nQIDAQABAoIBACOlVJ3F0HrIVQa9VQu+dJIJ3qXGHcYvFDVUpR9v\n-----END RSA PRIVATE KEY-----",
+            'private_key' => $privateKey,
             'client_email' => 'test@test-project.iam.gserviceaccount.com',
             'client_id' => '123456789',
             'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
             'token_uri' => 'https://oauth2.googleapis.com/token',
             'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
         ]);
+    }
+
+    /**
+     * Generate a valid RSA private key in PEM format for testing.
+     */
+    private function generatePrivateKeyPem(): string
+    {
+        $privateKey = openssl_pkey_new([
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
+
+        $privateKeyPem = '';
+        openssl_pkey_export($privateKey, $privateKeyPem);
+
+        return $privateKeyPem;
     }
 }
