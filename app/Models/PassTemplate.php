@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\ScopedByRegion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PassTemplate extends Model
 {
     /** @use HasFactory<\Database\Factories\PassTemplateFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopedByRegion, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

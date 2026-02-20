@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Policies\AccountSettingsPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,6 +31,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Gate::define('access-account-settings', [AccountSettingsPolicy::class, 'access']);
+
+        Queue::failing(function ($event) {
+            $job = $event->job;
+            $payload = method_exists($job, 'payload') ? $job->payload() : [];
+
+            Log::error('Queue job failed', [
+                'job_name' => $payload['displayName'] ?? get_class($job),
+                'queue' => $job->getQueue(),
+                'exception' => $event->exception->getMessage(),
+            ]);
+        });
     }
 
     /**

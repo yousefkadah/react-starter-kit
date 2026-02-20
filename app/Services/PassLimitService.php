@@ -9,7 +9,6 @@ class PassLimitService
     /**
      * Get the current subscription plan for a user.
      *
-     * @param User $user
      * @return string Plan key (free, starter, growth, business)
      */
     public function getCurrentPlan(User $user): string
@@ -34,10 +33,6 @@ class PassLimitService
 
     /**
      * Check if a user can create a pass for the given platforms.
-     *
-     * @param User $user
-     * @param array $platforms
-     * @return bool
      */
     public function canCreatePass(User $user, array $platforms): bool
     {
@@ -45,7 +40,7 @@ class PassLimitService
 
         // Check if all requested platforms are allowed
         foreach ($platforms as $platform) {
-            if (!in_array($platform, $planConfig['platforms'])) {
+            if (! in_array($platform, $planConfig['platforms'])) {
                 return false;
             }
         }
@@ -67,7 +62,6 @@ class PassLimitService
     /**
      * Get the number of remaining passes a user can create.
      *
-     * @param User $user
      * @return int|null Null means unlimited
      */
     public function getRemainingPasses(User $user): ?int
@@ -87,9 +81,6 @@ class PassLimitService
 
     /**
      * Get the plan configuration for a user's current plan.
-     *
-     * @param User $user
-     * @return array
      */
     public function getPlanConfig(User $user): array
     {
@@ -101,8 +92,6 @@ class PassLimitService
 
     /**
      * Get all available plans.
-     *
-     * @return array
      */
     public function getAllPlans(): array
     {
@@ -111,14 +100,11 @@ class PassLimitService
 
     /**
      * Check if a platform is allowed for a user's current plan.
-     *
-     * @param User $user
-     * @param string $platform
-     * @return bool
      */
     public function isPlatformAllowed(User $user, string $platform): bool
     {
         $planConfig = $this->getPlanConfig($user);
+
         return in_array($platform, $planConfig['platforms']);
     }
 }

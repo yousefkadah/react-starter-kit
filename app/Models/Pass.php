@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\ScopedByRegion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pass extends Model
 {
     /** @use HasFactory<\Database\Factories\PassFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopedByRegion, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -64,5 +66,47 @@ class Pass extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(PassTemplate::class, 'pass_template_id');
+    }
+
+    /**
+     * Get the distribution links for this pass.
+     */
+    public function distributionLinks(): HasMany
+    {
+        return $this->hasMany(PassDistributionLink::class, 'pass_id');
+    }
+
+    /**
+     * Get or create a distribution link for this pass.
+     */
+    public function getOrCreateDistributionLink(): PassDistributionLink
+    {
+        return $this->distributionLinks()
+            ->where('status', 'active')
+            ->firstOrCreate(
+                ['status' => 'active'],
+                ['slug' => \Illuminate\Support\Str::uuid()]
+            );
+    }
+
+    /**
+     * Check if the pass has expired.
+     */
+    public function isExpired(): bool
+    {
+        // Check if pass_data has expiry_date and compare to now
+        if (is_array($this->pass_data) && isset($this->pass_data['expiry_date'])) {
+            return strtotime($this->pass_data['expiry_date']) < time();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the pass has been voided.
+     */
+    public function isVoided(): bool
+    {
+        return $this->status === 'void' || $this->status === 'voided';
     }
 }

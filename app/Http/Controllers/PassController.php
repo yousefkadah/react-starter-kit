@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Pass\StorePassRequest;
 use App\Http\Requests\Pass\UpdatePassRequest;
+use App\Jobs\MarkOnboardingStepJob;
 use App\Models\Pass;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -75,6 +76,8 @@ class PassController extends Controller
             'status' => 'active',
         ]);
 
+        MarkOnboardingStepJob::dispatch($request->user()->id, 'first_pass');
+
         return to_route('passes.show', $pass)->with('success', 'Pass created successfully.');
     }
 
@@ -143,6 +146,7 @@ class PassController extends Controller
         foreach ($overrides as $key => $value) {
             if ($value === null && array_key_exists($key, $rawOverrides) && $rawOverrides[$key] === '') {
                 $merged[$key] = '';
+
                 continue;
             }
 
@@ -156,6 +160,7 @@ class PassController extends Controller
                     $value,
                     is_array($rawOverrides[$key] ?? null) ? $rawOverrides[$key] : [],
                 );
+
                 continue;
             }
 

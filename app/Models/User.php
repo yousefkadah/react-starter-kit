@@ -14,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, Billable, HasApiTokens;
+    use Billable, HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +26,19 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'region',
+        'tier',
+        'industry',
+        'approval_status',
+        'approved_at',
+        'approved_by',
+        'production_requested_at',
+        'production_approved_at',
+        'production_approved_by',
+        'production_rejected_at',
+        'production_rejected_reason',
+        'pre_launch_checklist',
+        'live_approved_at',
         'business_name',
         'business_address',
         'business_phone',
@@ -63,6 +76,12 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
+            'approved_at' => 'datetime',
+            'production_requested_at' => 'datetime',
+            'production_approved_at' => 'datetime',
+            'production_rejected_at' => 'datetime',
+            'pre_launch_checklist' => 'array',
+            'live_approved_at' => 'datetime',
         ];
     }
 
@@ -80,5 +99,69 @@ class User extends Authenticatable
     public function passTemplates(): HasMany
     {
         return $this->hasMany(PassTemplate::class);
+    }
+
+    /**
+     * Get the Apple certificates for the user.
+     */
+    public function appleCertificates(): HasMany
+    {
+        return $this->hasMany(AppleCertificate::class);
+    }
+
+    /**
+     * Get the Google credentials for the user.
+     */
+    public function googleCredentials(): HasMany
+    {
+        return $this->hasMany(GoogleCredential::class);
+    }
+
+    /**
+     * Get the onboarding steps for the user.
+     */
+    public function onboardingSteps(): HasMany
+    {
+        return $this->hasMany(OnboardingStep::class);
+    }
+
+    /**
+     * Get the admin who approved the account.
+     */
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the admin who approved production tier.
+     */
+    public function productionApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'production_approved_by');
+    }
+
+    /**
+     * Check if user is approved for production access.
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    /**
+     * Get the current tier of the user.
+     */
+    public function currentTier(): string
+    {
+        return $this->tier ?? 'Email_Verified';
+    }
+
+    /**
+     * Check if user can access wallet setup.
+     */
+    public function canAccessWalletSetup(): bool
+    {
+        return $this->email_verified_at !== null;
     }
 }

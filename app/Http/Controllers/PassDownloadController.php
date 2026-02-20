@@ -27,7 +27,7 @@ class PassDownloadController extends Controller
 
             $disk = Storage::disk(config('passkit.storage.passes_disk'));
 
-            if (!$disk->exists($pkpassPath)) {
+            if (! $disk->exists($pkpassPath)) {
                 return back()->withErrors(['error' => 'Pass file not found.']);
             }
 
@@ -35,7 +35,7 @@ class PassDownloadController extends Controller
                 'Content-Type' => 'application/vnd.apple.pkpass',
             ]);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to generate pass: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to generate pass: '.$e->getMessage()]);
         }
     }
 
@@ -55,7 +55,7 @@ class PassDownloadController extends Controller
 
             return back()->with('googleSaveUrl', $saveUrl);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to generate Google Wallet link: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to generate Google Wallet link: '.$e->getMessage()]);
         }
     }
 }

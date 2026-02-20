@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\MediaLibraryAssetController;
 use App\Http\Controllers\PassController;
+use App\Http\Controllers\PassDistributionController;
 use App\Http\Controllers\PassDownloadController;
 use App\Http\Controllers\PassImageController;
 use App\Http\Controllers\PassTemplateController;
-use App\Http\Controllers\MediaLibraryAssetController;
 use App\Http\Controllers\PassTypeFieldMapController;
 use App\Http\Controllers\PassTypeSampleController;
 use Illuminate\Support\Facades\Route;
@@ -61,4 +62,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('billing.checkout');
     Route::get('billing/portal', [BillingController::class, 'portal'])
         ->name('billing.portal');
+
+    // Pass distribution links
+    Route::post('passes/{pass}/distribution-links', [PassDistributionController::class, 'store'])
+        ->name('passes.distribution-links.store');
+    Route::get('passes/{pass}/distribution-links', [PassDistributionController::class, 'index'])
+        ->name('passes.distribution-links.index');
+    Route::patch('passes/{pass}/distribution-links/{distributionLink}', [PassDistributionController::class, 'update'])
+        ->name('passes.distribution-links.update');
 });

@@ -43,7 +43,7 @@ class PassTypeSampleRequest extends FormRequest
         return array_merge([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'pass_type' => ['required', 'string', 'in:' . implode(',', $passTypes)],
+            'pass_type' => ['required', 'string', 'in:'.implode(',', $passTypes)],
             'platform' => ['nullable', 'string', 'in:apple,google'],
             'fields' => ['required', 'array'],
             'images' => ['required', 'array'],

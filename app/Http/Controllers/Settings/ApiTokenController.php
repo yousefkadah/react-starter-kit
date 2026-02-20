@@ -17,7 +17,7 @@ class ApiTokenController extends Controller
         $tokens = $request->user()->tokens()->orderBy('created_at', 'desc')->get();
 
         return Inertia::render('settings/api-tokens', [
-            'tokens' => $tokens->map(fn($token) => [
+            'tokens' => $tokens->map(fn ($token) => [
                 'id' => $token->id,
                 'name' => $token->name,
                 'last_used_at' => $token->last_used_at?->toISOString(),

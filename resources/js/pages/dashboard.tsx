@@ -57,7 +57,11 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                     />
                     <StatCard
                         title="Plan Usage"
-                        value={stats.limit === null ? 'Unlimited' : `${stats.used}/${stats.limit}`}
+                        value={
+                            stats.limit === null
+                                ? 'Unlimited'
+                                : `${stats.used}/${stats.limit}`
+                        }
                         description="Passes created this period"
                     />
                 </div>
@@ -92,7 +96,10 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                                     {recentPasses.map((pass) => (
                                         <Link
                                             key={pass.id}
-                                            href={passes.show({ pass: pass.id }).url}
+                                            href={
+                                                passes.show({ pass: pass.id })
+                                                    .url
+                                            }
                                             className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent"
                                         >
                                             <div className="flex items-center gap-3">
@@ -100,19 +107,41 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                                                     <Wallet className="h-5 w-5 text-primary" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium">{pass.serial_number.substring(0, 8)}...</p>
+                                                    <p className="font-medium">
+                                                        {pass.serial_number.substring(
+                                                            0,
+                                                            8,
+                                                        )}
+                                                        ...
+                                                    </p>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {pass.pass_data.description}
+                                                        {
+                                                            pass.pass_data
+                                                                .description
+                                                        }
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {pass.platforms.map((p) => (
-                                                    <Badge key={p} variant={p === 'apple' ? 'default' : 'secondary'}>
+                                                    <Badge
+                                                        key={p}
+                                                        variant={
+                                                            p === 'apple'
+                                                                ? 'default'
+                                                                : 'secondary'
+                                                        }
+                                                    >
                                                         {p}
                                                     </Badge>
                                                 ))}
-                                                <Badge variant={pass.status === 'active' ? 'default' : 'outline'}>
+                                                <Badge
+                                                    variant={
+                                                        pass.status === 'active'
+                                                            ? 'default'
+                                                            : 'outline'
+                                                    }
+                                                >
                                                     {pass.status}
                                                 </Badge>
                                             </div>
@@ -134,14 +163,32 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                                     Create Pass
                                 </Link>
                             </Button>
-                            <Button asChild variant="outline" className="w-full">
-                                <Link href={passes.index().url}>View All Passes</Link>
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="w-full"
+                            >
+                                <Link href={passes.index().url}>
+                                    View All Passes
+                                </Link>
                             </Button>
-                            <Button asChild variant="outline" className="w-full">
-                                <Link href={templates.create().url}>New Template</Link>
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="w-full"
+                            >
+                                <Link href={templates.create().url}>
+                                    New Template
+                                </Link>
                             </Button>
-                            <Button asChild variant="outline" className="w-full">
-                                <Link href={billing.index().url}>Manage Billing</Link>
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="w-full"
+                            >
+                                <Link href={billing.index().url}>
+                                    Manage Billing
+                                </Link>
                             </Button>
                         </CardContent>
                     </Card>

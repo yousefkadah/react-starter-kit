@@ -1,11 +1,17 @@
 import { Head, useForm, usePage, router } from '@inertiajs/react';
-import{ Copy, Key, Plus, Trash2 } from 'lucide-react';
+import { Copy, Key, Plus, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
 import Heading from '@/components/heading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -48,7 +54,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ApiTokens({ tokens }: Props) {
-    const { flash } = usePage<{ flash?: { success?: string; token?: string } }>().props;
+    const { flash } = usePage<{
+        flash?: { success?: string; token?: string };
+    }>().props;
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newToken, setNewToken] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -75,7 +83,11 @@ export default function ApiTokens({ tokens }: Props) {
     };
 
     const handleDelete = (tokenId: number) => {
-        if (confirm('Are you sure you want to delete this API token? This action cannot be undone.')) {
+        if (
+            confirm(
+                'Are you sure you want to delete this API token? This action cannot be undone.',
+            )
+        ) {
             router.delete(`/settings/api-tokens/${tokenId}`, {
                 preserveScroll: true,
             });
@@ -122,7 +134,9 @@ export default function ApiTokens({ tokens }: Props) {
                             <AlertDescription>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="font-semibold">Your new API token:</p>
+                                        <p className="font-semibold">
+                                            Your new API token:
+                                        </p>
                                         <Button
                                             size="sm"
                                             variant="ghost"
@@ -141,11 +155,16 @@ export default function ApiTokens({ tokens }: Props) {
                                             variant="outline"
                                             onClick={copyToClipboard}
                                         >
-                                            {copied ? 'Copied!' : <Copy className="h-4 w-4" />}
+                                            {copied ? (
+                                                'Copied!'
+                                            ) : (
+                                                <Copy className="h-4 w-4" />
+                                            )}
                                         </Button>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
-                                        Please copy your token now. You won't be able to see it again.
+                                        Please copy your token now. You won't be
+                                        able to see it again.
                                     </p>
                                 </div>
                             </AlertDescription>
@@ -156,13 +175,15 @@ export default function ApiTokens({ tokens }: Props) {
                         <CardHeader>
                             <CardTitle>Active Tokens</CardTitle>
                             <CardDescription>
-                                These tokens allow external applications to access your account via the API
+                                These tokens allow external applications to
+                                access your account via the API
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {tokens.length === 0 ? (
                                 <div className="py-8 text-center text-muted-foreground">
-                                    No API tokens yet. Create one to get started.
+                                    No API tokens yet. Create one to get
+                                    started.
                                 </div>
                             ) : (
                                 <Table>
@@ -171,7 +192,9 @@ export default function ApiTokens({ tokens }: Props) {
                                             <TableHead>Name</TableHead>
                                             <TableHead>Last Used</TableHead>
                                             <TableHead>Created</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            <TableHead className="text-right">
+                                                Actions
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -183,24 +206,34 @@ export default function ApiTokens({ tokens }: Props) {
                                                 <TableCell className="text-muted-foreground">
                                                     {token.last_used_at
                                                         ? formatDistance(
-                                                              new Date(token.last_used_at),
+                                                              new Date(
+                                                                  token.last_used_at,
+                                                              ),
                                                               new Date(),
-                                                              { addSuffix: true }
+                                                              {
+                                                                  addSuffix: true,
+                                                              },
                                                           )
                                                         : 'Never'}
                                                 </TableCell>
                                                 <TableCell className="text-muted-foreground">
                                                     {formatDistance(
-                                                        new Date(token.created_at),
+                                                        new Date(
+                                                            token.created_at,
+                                                        ),
                                                         new Date(),
-                                                        { addSuffix: true }
+                                                        { addSuffix: true },
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleDelete(token.id)}
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                token.id,
+                                                            )
+                                                        }
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -217,21 +250,27 @@ export default function ApiTokens({ tokens }: Props) {
                         <CardHeader>
                             <CardTitle>API Documentation</CardTitle>
                             <CardDescription>
-                                Complete guide to integrate pass creation into your website or application
+                                Complete guide to integrate pass creation into
+                                your website or application
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-2">
-                                <h3 className="text-lg font-semibold">Base URL</h3>
+                                <h3 className="text-lg font-semibold">
+                                    Base URL
+                                </h3>
                                 <code className="block rounded bg-muted p-3 text-sm">
                                     {baseUrl}/api
                                 </code>
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-lg font-semibold">Authentication</h3>
+                                <h3 className="text-lg font-semibold">
+                                    Authentication
+                                </h3>
                                 <p className="text-sm text-muted-foreground">
-                                    All API requests must include your API token in the Authorization header:
+                                    All API requests must include your API token
+                                    in the Authorization header:
                                 </p>
                                 <code className="block rounded bg-muted p-3 text-sm">
                                     Authorization: Bearer YOUR_API_TOKEN
@@ -239,20 +278,29 @@ export default function ApiTokens({ tokens }: Props) {
                             </div>
 
                             <div className="space-y-3">
-                                <h3 className="text-lg font-semibold">1. Create a Pass</h3>
+                                <h3 className="text-lg font-semibold">
+                                    1. Create a Pass
+                                </h3>
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="rounded bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-600">POST</span>
-                                        <code className="text-sm">/api/passes</code>
+                                        <span className="rounded bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-600">
+                                            POST
+                                        </span>
+                                        <code className="text-sm">
+                                            /api/passes
+                                        </code>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
-                                        Create a new pass from a template with custom field values for your customer.
+                                        Create a new pass from a template with
+                                        custom field values for your customer.
                                     </p>
 
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium">Request Body:</p>
-                                        <pre className="block rounded bg-muted p-3 text-xs overflow-x-auto">
-{`{
+                                        <p className="text-sm font-medium">
+                                            Request Body:
+                                        </p>
+                                        <pre className="block overflow-x-auto rounded bg-muted p-3 text-xs">
+                                            {`{
   "template_id": 1,
   "member_id": "MEMBER123",
   "platforms": ["apple", "google"],
@@ -265,9 +313,11 @@ export default function ApiTokens({ tokens }: Props) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium">Example cURL:</p>
-                                        <pre className="block rounded bg-muted p-3 text-xs overflow-x-auto">
-{`curl -X POST ${baseUrl}/api/passes \\
+                                        <p className="text-sm font-medium">
+                                            Example cURL:
+                                        </p>
+                                        <pre className="block overflow-x-auto rounded bg-muted p-3 text-xs">
+                                            {`curl -X POST ${baseUrl}/api/passes \\
   -H "Authorization: Bearer YOUR_API_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -284,29 +334,56 @@ export default function ApiTokens({ tokens }: Props) {
                             </div>
 
                             <div className="space-y-3">
-                                <h3 className="text-lg font-semibold">2. Get Pass Details</h3>
+                                <h3 className="text-lg font-semibold">
+                                    2. Get Pass Details
+                                </h3>
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="rounded bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">GET</span>
-                                        <code className="text-sm">/api/passes/{'{pass_id}'}</code>
+                                        <span className="rounded bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">
+                                            GET
+                                        </span>
+                                        <code className="text-sm">
+                                            /api/passes/{'{pass_id}'}
+                                        </code>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <h3 className="text-lg font-semibold">3. List All Passes</h3>
+                                <h3 className="text-lg font-semibold">
+                                    3. List All Passes
+                                </h3>
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="rounded bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">GET</span>
-                                        <code className="text-sm">/api/passes</code>
+                                        <span className="rounded bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">
+                                            GET
+                                        </span>
+                                        <code className="text-sm">
+                                            /api/passes
+                                        </code>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-lg font-semibold">Template Placeholders</h3>
+                                <h3 className="text-lg font-semibold">
+                                    Template Placeholders
+                                </h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Use <code className="rounded bg-muted px-1.5 py-0.5">{'{{name}}'}</code>, <code className="rounded bg-muted px-1.5 py-0.5">{'{{points}}'}</code> etc. in templates. These will be replaced with <code className="rounded bg-muted px-1.5 py-0.5">custom_fields</code> values.
+                                    Use{' '}
+                                    <code className="rounded bg-muted px-1.5 py-0.5">
+                                        {'{{name}}'}
+                                    </code>
+                                    ,{' '}
+                                    <code className="rounded bg-muted px-1.5 py-0.5">
+                                        {'{{points}}'}
+                                    </code>{' '}
+                                    etc. in templates. These will be replaced
+                                    with{' '}
+                                    <code className="rounded bg-muted px-1.5 py-0.5">
+                                        custom_fields
+                                    </code>{' '}
+                                    values.
                                 </p>
                             </div>
                         </CardContent>
@@ -330,19 +407,33 @@ export default function ApiTokens({ tokens }: Props) {
                                     id="name"
                                     placeholder="My Website Integration"
                                     value={createForm.data.name}
-                                    onChange={(e) => createForm.setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        createForm.setData(
+                                            'name',
+                                            e.target.value,
+                                        )
+                                    }
                                     autoFocus
                                 />
                                 {createForm.errors.name && (
-                                    <p className="text-sm text-destructive">{createForm.errors.name}</p>
+                                    <p className="text-sm text-destructive">
+                                        {createForm.errors.name}
+                                    </p>
                                 )}
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowCreateDialog(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={createForm.processing}>
+                            <Button
+                                type="submit"
+                                disabled={createForm.processing}
+                            >
                                 Create Token
                             </Button>
                         </DialogFooter>
