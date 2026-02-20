@@ -151,6 +151,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the scanner links for the user.
+     */
+    public function scannerLinks(): HasMany
+    {
+        return $this->hasMany(ScannerLink::class);
+    }
+
+    /**
      * Get the admin who approved the account.
      */
     public function approvedBy()

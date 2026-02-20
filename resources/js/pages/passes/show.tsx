@@ -7,6 +7,7 @@ import {
     Download,
     Edit,
     ExternalLink,
+    QrCode,
     Share2,
     Trash2,
 } from 'lucide-react';
@@ -46,12 +47,26 @@ interface PassUpdateHistoryItem {
     created_at: string;
 }
 
+interface ScanEventItem {
+    id: number;
+    scanner_link_id: number | null;
+    action: string;
+    result: string;
+    ip_address: string | null;
+    created_at: string;
+    scanner_link?: {
+        id: number;
+        name: string;
+    } | null;
+}
+
 interface PassesShowProps {
     pass: Pass;
     recentPassUpdates: PassUpdateHistoryItem[];
+    recentScanEvents: ScanEventItem[];
 }
 
-export default function PassesShow({ pass, recentPassUpdates }: PassesShowProps) {
+export default function PassesShow({ pass, recentPassUpdates, recentScanEvents }: PassesShowProps) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [googleLink, setGoogleLink] = useState(pass.google_save_url);
     const [passUpdates, setPassUpdates] = useState<PassUpdateHistoryItem[]>(recentPassUpdates);
@@ -435,6 +450,52 @@ export default function PassesShow({ pass, recentPassUpdates }: PassesShowProps)
                                         <pre className="overflow-auto rounded bg-muted p-2 text-xs">
                                             {JSON.stringify(update.fields_changed, null, 2)}
                                         </pre>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Scan Event History */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-2">
+                                <QrCode className="h-5 w-5 text-muted-foreground" />
+                                <div>
+                                    <CardTitle>Scan History</CardTitle>
+                                    <CardDescription>Recent scan and redemption events for this pass.</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {recentScanEvents.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No scan events yet.</p>
+                                )}
+
+                                {recentScanEvents.map((event) => (
+                                    <div key={event.id} className="flex items-center justify-between rounded-md border p-3">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant={event.result === 'success' ? 'default' : 'secondary'}>
+                                                    {event.action}
+                                                </Badge>
+                                                <Badge variant={event.result === 'success' ? 'default' : 'destructive'}>
+                                                    {event.result}
+                                                </Badge>
+                                            </div>
+                                            {event.scanner_link && (
+                                                <p className="text-xs text-muted-foreground">
+                                                    Scanner: {event.scanner_link.name}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="text-right text-sm text-muted-foreground">
+                                            <p>{format(new Date(event.created_at), 'PPp')}</p>
+                                            {event.ip_address && (
+                                                <p className="text-xs">{event.ip_address}</p>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

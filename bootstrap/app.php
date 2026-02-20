@@ -33,12 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'enforce.pass.limit' => \App\Http\Middleware\EnforcePassLimit::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'hmac.signature' => \App\Http\Middleware\VerifyHmacSignature::class,
+            'scanner.token' => \App\Http\Middleware\ValidateScannerToken::class,
         ]);
 
-        // Exclude Stripe webhook routes from CSRF verification
+        // Exclude routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'stripe/*',
             'api/apple/*',
+            'api/scanner/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

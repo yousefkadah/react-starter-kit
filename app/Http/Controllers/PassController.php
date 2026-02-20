@@ -102,6 +102,18 @@ class PassController extends Controller
                     'google_delivery_status',
                     'created_at',
                 ]),
+            'recentScanEvents' => $pass->scanEvents()
+                ->with('scannerLink:id,name')
+                ->latest()
+                ->limit(20)
+                ->get([
+                    'id',
+                    'scanner_link_id',
+                    'action',
+                    'result',
+                    'ip_address',
+                    'created_at',
+                ]),
         ]);
     }
 

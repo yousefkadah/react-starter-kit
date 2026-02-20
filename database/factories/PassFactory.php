@@ -113,4 +113,46 @@ class PassFactory extends Factory
             'status' => 'expired',
         ]);
     }
+
+    /**
+     * Indicate that the pass is redeemed.
+     */
+    public function redeemed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'redeemed',
+            'usage_type' => 'single_use',
+            'redeemed_at' => now(),
+        ]);
+    }
+
+    /**
+     * Indicate that the pass is a single-use pass.
+     */
+    public function singleUse(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'usage_type' => 'single_use',
+        ]);
+    }
+
+    /**
+     * Indicate that the pass is a multi-use pass.
+     */
+    public function multiUse(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'usage_type' => 'multi_use',
+        ]);
+    }
+
+    /**
+     * Indicate that the pass has a custom redemption message.
+     */
+    public function withRedemptionMessage(string $message = 'Give customer a free coffee'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'custom_redemption_message' => $message,
+        ]);
+    }
 }
