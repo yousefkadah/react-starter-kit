@@ -25,7 +25,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin',
         'region',
         'tier',
         'industry',
@@ -62,6 +61,8 @@ class User extends Authenticatable
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+        'apple_certificate_password',
+        'google_service_account_json',
     ];
 
     /**
@@ -123,6 +124,30 @@ class User extends Authenticatable
     public function onboardingSteps(): HasMany
     {
         return $this->hasMany(OnboardingStep::class);
+    }
+
+    /**
+     * Get the device registrations for the user.
+     */
+    public function deviceRegistrations(): HasMany
+    {
+        return $this->hasMany(DeviceRegistration::class);
+    }
+
+    /**
+     * Get the pass updates for the user.
+     */
+    public function passUpdates(): HasMany
+    {
+        return $this->hasMany(PassUpdate::class);
+    }
+
+    /**
+     * Get the bulk updates for the user.
+     */
+    public function bulkUpdates(): HasMany
+    {
+        return $this->hasMany(BulkUpdate::class);
     }
 
     /**

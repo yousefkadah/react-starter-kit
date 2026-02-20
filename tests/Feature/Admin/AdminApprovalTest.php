@@ -112,7 +112,8 @@ class AdminApprovalTest extends TestCase
         $response = $this->actingAs($admin)->getJson('/admin/approvals/approved');
 
         $response->assertOk();
-        $response->assertJsonPath('total', 5);
+        // Admin user is also approved, so total is 6
+        $response->assertJsonPath('total', 6);
     }
 
     /**

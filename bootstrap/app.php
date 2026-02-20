@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -31,11 +32,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'enforce.pass.limit' => \App\Http\Middleware\EnforcePassLimit::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'hmac.signature' => \App\Http\Middleware\VerifyHmacSignature::class,
         ]);
 
         // Exclude Stripe webhook routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'stripe/*',
+            'api/apple/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

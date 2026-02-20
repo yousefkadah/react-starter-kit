@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use App\Policies\AccountSettingsPolicy;
+use App\Policies\PassUpdatePolicy;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -33,6 +36,14 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Gate::define('access-account-settings', [AccountSettingsPolicy::class, 'access']);
+        Gate::define('pass-update.update', [PassUpdatePolicy::class, 'update']);
+        Gate::define('pass-update.view-history', [PassUpdatePolicy::class, 'viewHistory']);
+
+        RateLimiter::for('push-notifications', function ($request) {
+            $userId = $request?->user()?->id ?? 'guest';
+
+            return Limit::perSecond(50)->by((string) $userId);
+        });
 
         Queue::failing(function ($event) {
             $job = $event->job;

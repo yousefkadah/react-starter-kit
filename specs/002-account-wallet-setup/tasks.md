@@ -504,7 +504,7 @@
 
 ### Certificate Renewal Flow (T4xx)
 
-- [ ] **T407**: Create certificate renewal workflow
+- [x] **T407**: Create certificate renewal workflow
   - User clicks "Renew" on expiring cert (< 30 days): dispatch new CSR, send email, mark cert as "renewal_pending"
   - User downloads new CSR and uploads to Apple
   - User uploads new cert: validate, create new AppleCertificate record (mark old as archived)
@@ -814,7 +814,7 @@
   - Verify: all systems work together, no data inconsistencies
   - ✅ COMPLETE: FullUserJourneyTest covers signup + wallet setup + tier advancement
 
-- [ ] **T704**: Code formatting with Laravel Pint
+- [x] **T704**: Code formatting with Laravel Pint
   - Run: `./vendor/bin/pint app/ database/ routes/ tests/ resources/js`
   - Verify: all files formatted per Laravel standards
   - Commit formatted code: `git add -A && git commit -m "style: Format code with Laravel Pint"`
@@ -857,20 +857,20 @@
 
 ### Performance & Security (T7xx)
 
-- [ ] **T709**: Profile and optimize database queries
+- [x] **T709**: Profile and optimize database queries
   - Run: `php artisan tinker` and profile signup flow queries
   - Check for N+1 problems (eager-load certificates, credentials, onboarding steps)
   - Profile certificate upload validation
   - Verify index performance on user_id, expiry_date
   - Test: no N+1 queries, indexes used
 
-- [ ] **T710**: Load test certificate upload (concurrent uploads)
+- [x] **T710**: Load test certificate upload (concurrent uploads)
   - Simulate 100 concurrent file uploads
   - Verify validation runs correctly under load
   - Verify no race conditions on AppleCertificate/GoogleCredential creation
   - Test: system handles concurrent uploads
 
-- [ ] **T711**: Security audit
+- [x] **T711**: Security audit
   - Audit all Form Requests: validate all inputs, no dangerous characters
   - Audit all Policies: authorization gaps, admin checks
   - Audit encryption: cert passwords encrypted, private keys encrypted
@@ -890,7 +890,7 @@
 
 ### Manual QA (T7xx)
 
-- [ ] **T713**: Cross-browser manual QA
+- [x] **T713**: Cross-browser manual QA
   - Test all user flows on: Chrome, Safari, Firefox
   - Test on mobile devices: iPhone (Safari), Android (Chrome)
   - Test error cases: invalid cert, network timeout, form validation errors
@@ -918,7 +918,7 @@
   - Test: rollback procedure documented, team can execute if needed
   - ✅ COMPLETE: docs/rollback-plan.md added
 
-- [ ] **T716**: Final validation checklist
+- [x] **T716**: Final validation checklist
   - Verify all 116 tasks completed
   - Verify all tests passing: `php artisan test tests/Feature/AccountSetup/`
   - Verify test coverage >80%: `php artisan test tests/ --coverage`

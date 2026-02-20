@@ -199,9 +199,6 @@ class CertificateRenewalTest extends TestCase
 
     /**
      * Test certificate marked as renewal_pending after renew request.
-     *
-     * Note: This test assumes we track renewal status in the database.
-     * If not implemented, this can be skipped or the implementation added.
      */
     public function test_certificate_marked_as_renewal_pending(): void
     {
@@ -215,6 +212,10 @@ class CertificateRenewalTest extends TestCase
 
         // Refresh certificate from database
         $this->certificate->refresh();
+
+        // Verify certificate is marked as renewal_pending
+        $this->assertEquals('renewal_pending', $this->certificate->status);
+        $this->assertTrue($this->certificate->isRenewalPending());
 
         // Verify certificate is still active (not soft deleted)
         $this->assertNull($this->certificate->deleted_at);

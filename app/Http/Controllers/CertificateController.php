@@ -95,6 +95,11 @@ class CertificateController extends Controller
             $certContent = $file->get();
             $encryptedPassword = $request->password ? Crypt::encryptString($request->password) : null;
 
+            // Archive any existing renewal_pending certificates for this user
+            AppleCertificate::where('user_id', $user->id)
+                ->where('status', 'renewal_pending')
+                ->update(['status' => 'archived']);
+
             // Create AppleCertificate record
             $certificate = AppleCertificate::create([
                 'user_id' => $user->id,
@@ -254,6 +259,9 @@ class CertificateController extends Controller
         try {
             // Generate new CSR
             $csr = $this->csrService->generateCSR($user);
+
+            // Mark certificate as renewal_pending
+            $certificate->update(['status' => 'renewal_pending']);
 
             // Send email with renewal instructions
             \Illuminate\Support\Facades\Mail::to($user->email)

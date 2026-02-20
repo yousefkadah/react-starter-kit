@@ -69,7 +69,9 @@ class BusinessSettingsController extends Controller
 
         $request->user()->update([
             'google_issuer_id' => $validated['issuer_id'],
-            'google_service_account_json' => $validated['service_account_json'],
+            'google_service_account_json' => $validated['service_account_json']
+                ? \Illuminate\Support\Facades\Crypt::encryptString($validated['service_account_json'])
+                : null,
         ]);
 
         return back()->with('success', 'Google Wallet configuration updated successfully.');
@@ -91,7 +93,9 @@ class BusinessSettingsController extends Controller
             'apple_team_id' => $validated['team_id'],
             'apple_pass_type_id' => $validated['pass_type_id'],
             'apple_certificate' => $validated['certificate'],
-            'apple_certificate_password' => $validated['certificate_password'],
+            'apple_certificate_password' => $validated['certificate_password']
+                ? \Illuminate\Support\Facades\Crypt::encryptString($validated['certificate_password'])
+                : null,
         ]);
 
         return back()->with('success', 'Apple Wallet configuration updated successfully.');

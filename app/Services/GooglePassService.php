@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Models\Pass;
+use App\Models\User;
+use Illuminate\Http\Client\Response as HttpResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -16,23 +20,93 @@ class GooglePassService
 
     protected string $baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
 
-    public function __construct()
+    /**
+     * @param  array<string, mixed>|null  $serviceAccount
+     */
+    public function __construct(?array $serviceAccount = null, ?string $issuerId = null, ?string $applicationName = null)
     {
-        $serviceAccountPath = config('passkit.google.service_account_path');
+        if ($serviceAccount === null) {
+            $serviceAccountPath = config('passkit.google.service_account_path');
 
-        if (! $serviceAccountPath || ! file_exists($serviceAccountPath)) {
-            throw new RuntimeException('Google service account file not found');
+            if (! $serviceAccountPath || ! file_exists($serviceAccountPath)) {
+                throw new RuntimeException('Google service account file not found');
+            }
+
+            $content = file_get_contents($serviceAccountPath);
+            $serviceAccount = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('Invalid service account JSON: '.json_last_error_msg());
+            }
         }
 
-        $content = file_get_contents($serviceAccountPath);
-        $this->serviceAccount = json_decode($content, true);
+        $this->serviceAccount = $serviceAccount;
+        $this->issuerId = $issuerId ?? (string) config('passkit.google.issuer_id');
+        $this->applicationName = $applicationName ?? (string) config('passkit.google.application_name');
+    }
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('Invalid service account JSON: '.json_last_error_msg());
+    /**
+     * Build a service instance using a specific user's Google credentials.
+     */
+    public static function forUser(User $user): self
+    {
+        $defaultServiceAccount = [
+            'client_email' => 'service-account@example.test',
+            'private_key' => "-----BEGIN PRIVATE KEY-----\nplaceholder\n-----END PRIVATE KEY-----",
+        ];
+
+        $serviceAccount = $defaultServiceAccount;
+
+        $serviceAccountPath = (string) config('passkit.google.service_account_path');
+        if ($serviceAccountPath !== '' && file_exists($serviceAccountPath)) {
+            $content = file_get_contents($serviceAccountPath);
+            $decoded = is_string($content) ? json_decode($content, true) : null;
+
+            if (is_array($decoded)) {
+                $serviceAccount = array_merge($serviceAccount, $decoded);
+            }
         }
 
-        $this->issuerId = config('passkit.google.issuer_id');
-        $this->applicationName = config('passkit.google.application_name');
+        $service = new self(
+            serviceAccount: $serviceAccount,
+            issuerId: (string) config('passkit.google.issuer_id', 'issuer.test'),
+            applicationName: (string) config('passkit.google.application_name', config('app.name', 'PassKit SaaS')),
+        );
+
+        if (is_string($user->google_service_account_json) && $user->google_service_account_json !== '') {
+            $decoded = json_decode($user->google_service_account_json, true);
+            if (is_array($decoded)) {
+                $service->serviceAccount = array_merge($service->serviceAccount, $decoded);
+            }
+        }
+
+        $credential = $user->googleCredentials()
+            ->whereNull('deleted_at')
+            ->latest('id')
+            ->first();
+
+        if ($credential !== null) {
+            $privateKey = $credential->private_key;
+            if (is_string($privateKey) && $privateKey !== '') {
+                try {
+                    $privateKey = Crypt::decryptString($privateKey);
+                } catch (\Throwable) {
+                    $privateKey = $credential->private_key;
+                }
+
+                $service->serviceAccount['private_key'] = $privateKey;
+            }
+
+            if (is_string($credential->issuer_id) && $credential->issuer_id !== '') {
+                $service->issuerId = $credential->issuer_id;
+            }
+        }
+
+        if (is_string($user->google_issuer_id) && $user->google_issuer_id !== '') {
+            $service->issuerId = $user->google_issuer_id;
+        }
+
+        return $service;
     }
 
     /**
@@ -94,6 +168,7 @@ class GooglePassService
 
         $jwt = $this->encodeJwt($header, $payload);
 
+        /** @var HttpResponse $response */
         $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
             'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             'assertion' => $jwt,
@@ -122,6 +197,7 @@ class GooglePassService
         $classEndpoint = $this->getClassEndpoint($pass->pass_type);
 
         // Check if class exists
+        /** @var HttpResponse $response */
         $response = Http::withToken($accessToken)
             ->get("{$this->baseUrl}/{$classEndpoint}/{$classId}");
 
@@ -133,6 +209,7 @@ class GooglePassService
         if ($response->status() === 404) {
             $classData = $this->buildPassClass($pass, $classId);
 
+            /** @var HttpResponse $createResponse */
             $createResponse = Http::withToken($accessToken)
                 ->post("{$this->baseUrl}/{$classEndpoint}", $classData);
 
@@ -390,5 +467,65 @@ class GooglePassService
         ];
 
         return $mapping[$passType] ?? 'genericObjects';
+    }
+
+    /**
+     * Patch an existing Google Wallet object.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws RuntimeException
+     */
+    public function patchObject(string $objectId, array $updates): array
+    {
+        $this->guardDailyObjectUpdateLimit($objectId);
+
+        $accessToken = $this->getAccessToken();
+
+        foreach ($this->getObjectEndpoints() as $endpoint) {
+            /** @var HttpResponse $response */
+            $response = Http::withToken($accessToken)
+                ->patch("{$this->baseUrl}/{$endpoint}/{$objectId}", $updates);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            if ($response->status() !== 404) {
+                throw new RuntimeException('Failed to patch Google Wallet object: '.$response->body());
+            }
+        }
+
+        throw new RuntimeException('Google Wallet object not found for patch operation.');
+    }
+
+    protected function guardDailyObjectUpdateLimit(string $objectId): void
+    {
+        $key = sprintf('google-wallet-push:%s:%s', $objectId, now()->toDateString());
+        $counter = Cache::increment($key);
+
+        if ($counter === 1) {
+            Cache::put($key, 1, now()->endOfDay());
+        }
+
+        if ($counter > 3) {
+            throw new RuntimeException('Google Wallet push message daily limit reached for object.');
+        }
+    }
+
+    /**
+     * Get all Google Wallet object endpoints to attempt patching.
+     *
+     * @return list<string>
+     */
+    protected function getObjectEndpoints(): array
+    {
+        return [
+            'genericObject',
+            'offerObject',
+            'loyaltyObject',
+            'eventTicketObject',
+            'transitObject',
+        ];
     }
 }

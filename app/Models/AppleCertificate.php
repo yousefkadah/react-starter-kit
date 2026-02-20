@@ -21,6 +21,8 @@ class AppleCertificate extends Model
         'expiry_notified_30_days',
         'expiry_notified_7_days',
         'expiry_notified_0_days',
+        'fingerprint',
+        'status',
     ];
 
     protected function casts(): array
@@ -32,6 +34,22 @@ class AppleCertificate extends Model
             'expiry_notified_7_days' => 'boolean',
             'expiry_notified_0_days' => 'boolean',
         ];
+    }
+
+    /**
+     * Check if certificate is pending renewal.
+     */
+    public function isRenewalPending(): bool
+    {
+        return $this->status === 'renewal_pending';
+    }
+
+    /**
+     * Check if certificate is archived.
+     */
+    public function isArchived(): bool
+    {
+        return $this->status === 'archived';
     }
 
     /**

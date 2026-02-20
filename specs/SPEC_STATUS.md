@@ -21,28 +21,25 @@
 
 ### 001-pass-distribution — Pass Distribution System
 - **Gap Section**: §2 Distribution (partial)
-- **Status**: ⚠️ 95% Complete (56/65 tasks — manual QA & git ops remaining)
+- **Status**: ✅ Complete (65/65 tasks)
 - **Covers**: Shareable pass links, device detection, QR code distribution, link enable/disable control
-- **Remaining**: Manual QA verification (T056–T060), commit/PR/merge (T062–T065)
 - **Spec**: [spec.md](001-pass-distribution/spec.md) | [tasks.md](001-pass-distribution/tasks.md)
 
 ### 002-account-wallet-setup — Account Creation & Wallet Setup
 - **Gap Section**: §0 Account Creation & Wallet Setup
-- **Status**: ⚠️ 95% Complete (109/116 tasks — Phase 7 polish remaining)
-- **Covers**: Email domain validation, data region selection, industry selection, account tier progression, Apple CSR generation & certificate upload, Google credential upload, certificate expiry alerts, admin approval queue, onboarding wizard
-- **Remaining**: T407 (cert renewal workflow), T704 (Pint), T709–T711 (profiling/load test/security audit), T713 (manual QA), T716 (final checklist)
+- **Status**: ✅ Complete (116/116 tasks)
+- **Covers**: Email domain validation, data region selection, industry selection, account tier progression, Apple CSR generation & certificate upload, Google credential upload, certificate expiry alerts, admin approval queue, onboarding wizard, certificate renewal workflow, security hardening, N+1 query optimizations
 - **Spec**: [spec.md](002-account-wallet-setup/spec.md) | [tasks.md](002-account-wallet-setup/tasks.md)
+
+### 003-push-pass-updates — Push Notifications & Real-Time Pass Updates
+- **Gap Section**: §3 Pass Updates & Notifications
+- **Status**: ✅ Complete (80/80 tasks)
+- **Covers**: Apple APNS push notifications, Google Wallet object updates, Apple Web Service Protocol endpoints, single pass updates, bulk updates with progress tracking, lock screen change messages, pull-to-refresh, pass update API with Sanctum/HMAC auth, delivery status UI, 90-day history pruning
+- **Spec**: [spec.md](001-push-pass-updates/spec.md) | [plan.md](001-push-pass-updates/plan.md) | [tasks.md](001-push-pass-updates/tasks.md)
 
 ---
 
 ## Not Yet Started — Ordered by Priority
-
-### 003 — Push Notifications & Real-Time Pass Updates
-- **Gap Section**: §3 Pass Updates & Notifications
-- **Priority**: Critical (#1)
-- **Why next**: Passes are static after issuance — without push, updates never reach users' wallets
-- **Scope**: Apple APNS push notifications, Google Wallet change notifications, real-time field updates via API, bulk updates, lock screen change messages, pull-to-refresh support
-- **Spec**: Not created
 
 ### 004 — Pass Validation & Scanning
 - **Gap Section**: §4 Pass Acceptance & Validation
@@ -165,7 +162,7 @@
 | §0 Account Creation & Wallet Setup | `002-account-wallet-setup` | ✅ Done |
 | §1 Design & Pass Creation | `001-pass-type-samples`, `001-pass-image-resize-preview` | ⚠️ Partial — fields, barcodes, extra pass types remain |
 | §2 Distribution | `001-pass-distribution` | ⚠️ Partial — links/QR done; email, SMS, batch, sharing remain |
-| §3 Pass Updates & Notifications | — | ❌ Not started |
+| §3 Pass Updates & Notifications | `001-push-pass-updates` | ✅ Done |
 | §4 Pass Acceptance & Validation | — | ❌ Not started |
 | §5 Analytics & Reporting | — | ❌ Not started |
 | §6 Integrations | — | ❌ Not started |

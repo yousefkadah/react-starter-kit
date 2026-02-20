@@ -5,11 +5,26 @@ use App\Http\Controllers\MediaLibraryAssetController;
 use App\Http\Controllers\PassController;
 use App\Http\Controllers\PassDistributionController;
 use App\Http\Controllers\PassDownloadController;
+use App\Http\Controllers\Passes\AppleWebServiceController;
+use App\Http\Controllers\Passes\PassUpdateDashboardController;
 use App\Http\Controllers\PassImageController;
 use App\Http\Controllers\PassTemplateController;
 use App\Http\Controllers\PassTypeFieldMapController;
 use App\Http\Controllers\PassTypeSampleController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('api/apple/v1')->group(function () {
+    Route::post('devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}/{serialNumber}', [AppleWebServiceController::class, 'registerDevice'])
+        ->name('apple.web-service.register-device');
+    Route::delete('devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}/{serialNumber}', [AppleWebServiceController::class, 'unregisterDevice'])
+        ->name('apple.web-service.unregister-device');
+    Route::get('devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}', [AppleWebServiceController::class, 'getUpdatedPasses'])
+        ->name('apple.web-service.get-updated-passes');
+    Route::get('passes/{passTypeIdentifier}/{serialNumber}', [AppleWebServiceController::class, 'getLatestPass'])
+        ->name('apple.web-service.get-latest-pass');
+    Route::post('log', [AppleWebServiceController::class, 'logErrors'])
+        ->name('apple.web-service.log-errors');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Pass type samples
@@ -47,6 +62,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('passes.download.apple');
     Route::post('passes/{pass}/generate/google', [PassDownloadController::class, 'generateGoogleLink'])
         ->name('passes.generate.google');
+
+    Route::patch('passes/{pass}/update', [PassUpdateDashboardController::class, 'update'])
+        ->name('passes.update-fields');
+    Route::get('passes/{pass}/updates', [PassUpdateDashboardController::class, 'history'])
+        ->name('passes.updates.history');
+    Route::post('passes/bulk-update', [PassUpdateDashboardController::class, 'bulkUpdate'])
+        ->name('passes.bulk-update');
+    Route::get('passes/bulk-update/{bulkUpdate}', [PassUpdateDashboardController::class, 'bulkUpdateStatus'])
+        ->name('passes.bulk-update.status');
 
     // Pass image upload
     Route::post('passes/images', [PassImageController::class, 'store'])

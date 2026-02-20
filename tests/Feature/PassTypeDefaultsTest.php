@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Pass;
 use App\Models\PassTemplate;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +13,7 @@ class PassTypeDefaultsTest extends TestCase
 
     public function test_it_applies_template_defaults_when_pass_fields_are_null(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createRegionScopedUser();
 
         $template = PassTemplate::create([
             'user_id' => $user->id,
@@ -65,7 +64,7 @@ class PassTypeDefaultsTest extends TestCase
 
     public function test_it_keeps_explicit_empty_string_overrides(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createRegionScopedUser();
 
         $template = PassTemplate::create([
             'user_id' => $user->id,

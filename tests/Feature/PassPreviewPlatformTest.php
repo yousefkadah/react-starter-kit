@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Pass;
 use App\Models\PassTemplate;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -15,7 +14,7 @@ class PassPreviewPlatformTest extends TestCase
 
     public function test_pass_edit_page_includes_platforms_for_preview_toggle(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createRegionScopedUser();
         $pass = Pass::factory()->create([
             'user_id' => $user->id,
             'platforms' => ['apple', 'google'],
@@ -31,7 +30,7 @@ class PassPreviewPlatformTest extends TestCase
 
     public function test_template_edit_page_includes_platforms_for_preview_toggle(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createRegionScopedUser();
         $template = PassTemplate::factory()->create([
             'user_id' => $user->id,
             'platforms' => ['apple', 'google'],

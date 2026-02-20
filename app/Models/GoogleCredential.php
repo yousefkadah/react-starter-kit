@@ -20,6 +20,15 @@ class GoogleCredential extends Model
         'last_rotated_at',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'private_key',
+    ];
+
     protected function casts(): array
     {
         return [

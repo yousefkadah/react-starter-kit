@@ -3,11 +3,15 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ProductionApprovalController;
 use App\Http\Controllers\Api\PassApiController;
+use App\Http\Controllers\Api\PassUpdateController;
 use App\Http\Controllers\CertificateController;
 use Illuminate\Support\Facades\Route;
 
 // Public signup endpoint
-Route::post('/signup', [AccountController::class, 'store']);
+Route::post('/signup', [AccountController::class, 'store'])
+    ->middleware('throttle:5,1');
+
+Route::patch('/passes/{pass}/fields', [PassUpdateController::class, 'update']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Account endpoints
@@ -23,8 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('account.tier.go-live');
 
     // Certificate endpoints
-    Route::get('/certificates/apple/csr', [CertificateController::class, 'downloadAppleCSR']);
-    Route::post('/certificates/apple', [CertificateController::class, 'uploadAppleCertificate']);
+    Route::get('/certificates/apple/csr', [CertificateController::class, 'downloadAppleCSR'])
+        ->middleware('throttle:10,1');
+    Route::post('/certificates/apple', [CertificateController::class, 'uploadAppleCertificate'])
+        ->middleware('throttle:10,1');
     Route::delete('/certificates/apple/{certificate}', [CertificateController::class, 'deleteAppleCertificate']);
     Route::get('/certificates/apple/{certificate}/renew', [CertificateController::class, 'renewAppleCertificate']);
 
@@ -40,4 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // List user's passes
     Route::get('/passes', [PassApiController::class, 'index']);
+
+    // Pass update history
+    Route::get('/passes/{pass}/updates', [PassUpdateController::class, 'history']);
 });

@@ -41,10 +41,6 @@ class AccountSettingsTest extends TestCase
             'tier' => 'Email_Verified',
             'approval_status' => 'approved',
             'region' => 'US',
-        ]);
-
-        $user->update([
-            'name' => null,
             'industry' => null,
         ]);
 
