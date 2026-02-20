@@ -4,6 +4,7 @@ use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\BusinessSettingsController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\ScannerLinkController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,4 +47,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('business.update-google');
     Route::patch('settings/business/apple', [BusinessSettingsController::class, 'updateApple'])
         ->name('business.update-apple');
+
+    Route::get('settings/scanner-links', [ScannerLinkController::class, 'index'])
+        ->name('scanner-links.index');
+    Route::post('settings/scanner-links', [ScannerLinkController::class, 'store'])
+        ->name('scanner-links.store');
+    Route::patch('settings/scanner-links/{scannerLink}', [ScannerLinkController::class, 'update'])
+        ->name('scanner-links.update');
+    Route::delete('settings/scanner-links/{scannerLink}', [ScannerLinkController::class, 'destroy'])
+        ->name('scanner-links.destroy');
 });

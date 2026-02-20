@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PassDistributionController;
+use App\Http\Controllers\Scanner\ScannerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -14,6 +15,10 @@ Route::get('/', function () {
 // Public distribution link route (no authentication required)
 Route::get('p/{slug}', [PassDistributionController::class, 'show'])
     ->name('passes.show-by-link');
+
+// Public scanner interface (authenticated via scanner token, no user login required)
+Route::get('scanner/{token}', [ScannerController::class, 'show'])
+    ->name('scanner.show');
 
 Route::get('dashboard', function () {
     $user = auth()->user();

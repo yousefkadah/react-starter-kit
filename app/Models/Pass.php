@@ -27,6 +27,9 @@ class Pass extends Model
         'serial_number',
         'authentication_token',
         'status',
+        'usage_type',
+        'custom_redemption_message',
+        'redeemed_at',
         'pass_data',
         'barcode_data',
         'images',
@@ -60,6 +63,7 @@ class Pass extends Model
             'images' => 'array',
             'authentication_token' => 'string',
             'last_generated_at' => 'datetime',
+            'redeemed_at' => 'datetime',
         ];
     }
 
@@ -101,6 +105,49 @@ class Pass extends Model
     public function passUpdates(): HasMany
     {
         return $this->hasMany(PassUpdate::class);
+    }
+
+    /**
+     * Get scan events for this pass.
+     */
+    public function scanEvents(): HasMany
+    {
+        return $this->hasMany(ScanEvent::class);
+    }
+
+    /**
+     * Determine if this pass has been redeemed.
+     */
+    public function isRedeemed(): bool
+    {
+        return $this->status === 'redeemed';
+    }
+
+    /**
+     * Mark this pass as redeemed and auto-void for single-use passes.
+     */
+    public function markAsRedeemed(): void
+    {
+        $this->update([
+            'status' => 'redeemed',
+            'redeemed_at' => now(),
+        ]);
+    }
+
+    /**
+     * Determine if this pass is a single-use pass.
+     */
+    public function isSingleUse(): bool
+    {
+        return $this->usage_type === 'single_use';
+    }
+
+    /**
+     * Determine if this pass is a multi-use pass.
+     */
+    public function isMultiUse(): bool
+    {
+        return $this->usage_type === 'multi_use';
     }
 
     /**

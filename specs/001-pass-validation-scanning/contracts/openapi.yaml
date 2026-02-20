@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Pass Validation & Scanning API
+  version: 1.0.0
+  description: API for validating and redeeming digital passes via web scanner or POS integration.
+
+paths:
+  /api/scanner/validate:
+    post:
+      summary: Validate a scanned pass payload
+      description: Decodes the HMAC-signed payload, verifies authenticity, and returns the pass status.
+      security:
+        - ScannerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payload
+              properties:
+                payload:
+                  type: string
+                  description: The base64 encoded HMAC-signed payload from the QR code.
+      responses:
+        '200':
+          description: Pass successfully validated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  pass:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      type:
+                        type: string
+                        enum: [single_use, multi_use]
+                      status:
+                        type: string
+                        enum: [active, redeemed, voided, expired]
+                      custom_redemption_message:
+                        type: string
+                        nullable: true
+        '400':
+          description: Invalid payload signature or format
+        '404':
+          description: Pass not found or belongs to another tenant
+
+  /api/scanner/redeem:
+    post:
+      summary: Redeem a single-use pass or log a multi-use scan
+      description: Marks a single-use pass as redeemed (using pessimistic locking) or logs a visit for a multi-use pass.
+      security:
+        - ScannerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payload
+              properties:
+                payload:
+                  type: string
+                  description: The base64 encoded HMAC-signed payload from the QR code.
+      responses:
+        '200':
+          description: Pass successfully redeemed or logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  pass:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      status:
+                        type: string
+        '400':
+          description: Invalid payload signature or format
+        '404':
+          description: Pass not found or belongs to another tenant
+        '409':
+          description: Pass already redeemed, voided, or expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  redeemed_at:
+                    type: string
+                    format: date-time
+
+components:
+  securitySchemes:
+    ScannerToken:
+      type: apiKey
+      in: header
+      name: X-Scanner-Token
+      description: The unique, long-lived token generated for the location/tenant.

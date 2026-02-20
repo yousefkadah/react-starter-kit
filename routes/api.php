@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\ProductionApprovalController;
 use App\Http\Controllers\Api\PassApiController;
 use App\Http\Controllers\Api\PassUpdateController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\Scanner\RedeemPassController;
+use App\Http\Controllers\Scanner\ValidatePassController;
 use Illuminate\Support\Facades\Route;
 
 // Public signup endpoint
@@ -49,4 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Pass update history
     Route::get('/passes/{pass}/updates', [PassUpdateController::class, 'history']);
+});
+
+// Scanner API routes (authenticated via scanner token, no user login required)
+Route::middleware('scanner.token')->prefix('scanner')->group(function () {
+    Route::post('/validate', ValidatePassController::class)->name('scanner.validate');
+    Route::post('/redeem', RedeemPassController::class)->name('scanner.redeem');
 });
