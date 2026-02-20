@@ -92,6 +92,16 @@ class PassController extends Controller
 
         return Inertia::render('passes/show', [
             'pass' => $pass,
+            'recentPassUpdates' => $pass->passUpdates()
+                ->latest('id')
+                ->limit(10)
+                ->get([
+                    'id',
+                    'fields_changed',
+                    'apple_delivery_status',
+                    'google_delivery_status',
+                    'created_at',
+                ]),
         ]);
     }
 

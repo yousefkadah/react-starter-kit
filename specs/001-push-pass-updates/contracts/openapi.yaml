@@ -1,0 +1,508 @@
+# Push Notifications & Real-Time Pass Updates — API Contracts
+
+openapi: "3.1.0"
+info:
+  title: Push Notifications & Real-Time Pass Updates API
+  version: "1.0.0"
+  description: |
+    API contracts for pass updates, push notifications, Apple Web Service Protocol,
+    and bulk update operations. Covers both internal (dashboard/API) and external
+    (Apple Wallet device) endpoints.
+
+servers:
+  - url: "{baseUrl}"
+    variables:
+      baseUrl:
+        default: "https://app.example.com"
+
+# ==============================================================================
+# PATHS
+# ==============================================================================
+
+paths:
+
+  # --------------------------------------------------------------------------
+  # PASS UPDATE API (Sanctum + HMAC authenticated)
+  # --------------------------------------------------------------------------
+
+  /api/passes/{pass}/fields:
+    patch:
+      operationId: updatePassFields
+      summary: Update pass field values and trigger push notifications
+      description: |
+        Updates one or more fields on a pass, persists the changes, regenerates
+        platform-specific pass files, and dispatches push notifications to all
+        registered devices. Supports both Sanctum bearer token and HMAC-SHA256
+        signature authentication.
+      tags: [Pass Updates]
+      security:
+        - sanctumAuth: []
+        - hmacAuth: []
+      parameters:
+        - name: pass
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Pass ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePassFieldsRequest"
+      responses:
+        "200":
+          description: Pass updated successfully, push notifications queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PassUpdateResponse"
+        "403":
+          description: Forbidden — pass belongs to another user
+        "422":
+          description: Validation error — invalid field values or exceeds 10KB limit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "409":
+          description: Conflict — pass is voided, cannot be updated
+
+  # --------------------------------------------------------------------------
+  # BULK UPDATE API (Sanctum authenticated, dashboard)
+  # --------------------------------------------------------------------------
+
+  /api/passes/bulk-update:
+    post:
+      operationId: createBulkUpdate
+      summary: Start a bulk update for all passes of a template
+      description: |
+        Queues a bulk update job that updates a specified field across all matching
+        passes of a template. Returns immediately with a bulk update tracking ID.
+        Rejects if another bulk update is already in progress for the same template.
+      tags: [Bulk Updates]
+      security:
+        - sanctumAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkUpdateRequest"
+      responses:
+        "202":
+          description: Bulk update accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkUpdateResponse"
+        "409":
+          description: Conflict — another bulk update is in progress for this template
+        "422":
+          description: Validation error
+
+  /api/passes/bulk-update/{bulkUpdate}:
+    get:
+      operationId: getBulkUpdateStatus
+      summary: Get the status and progress of a bulk update
+      tags: [Bulk Updates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - name: bulkUpdate
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bulk update status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkUpdateStatusResponse"
+        "404":
+          description: Bulk update not found
+
+  # --------------------------------------------------------------------------
+  # PASS UPDATE HISTORY (Sanctum authenticated)
+  # --------------------------------------------------------------------------
+
+  /api/passes/{pass}/updates:
+    get:
+      operationId: getPassUpdateHistory
+      summary: Get the update history for a pass
+      tags: [Pass Updates]
+      security:
+        - sanctumAuth: []
+      parameters:
+        - name: pass
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+            maximum: 50
+      responses:
+        "200":
+          description: Paginated update history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PassUpdateHistoryResponse"
+
+  # --------------------------------------------------------------------------
+  # APPLE WEB SERVICE PROTOCOL (5 endpoints, no Sanctum — uses authenticationToken)
+  # --------------------------------------------------------------------------
+
+  /api/apple/v1/devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}/{serialNumber}:
+    post:
+      operationId: registerDevice
+      summary: "Apple Web Service: Register a device for push notifications"
+      description: |
+        Called by Apple Wallet when a customer adds a pass to their device.
+        Stores the device's push token for future notifications.
+      tags: [Apple Web Service Protocol]
+      security:
+        - applePassAuth: []
+      parameters:
+        - $ref: "#/components/parameters/deviceLibraryIdentifier"
+        - $ref: "#/components/parameters/passTypeIdentifier"
+        - $ref: "#/components/parameters/serialNumber"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pushToken]
+              properties:
+                pushToken:
+                  type: string
+                  description: APNS push token for this device
+      responses:
+        "200":
+          description: Registration updated (device already registered)
+        "201":
+          description: Registration created (new device)
+        "401":
+          description: Unauthorized — invalid authentication token
+
+    delete:
+      operationId: unregisterDevice
+      summary: "Apple Web Service: Unregister a device"
+      description: |
+        Called by Apple Wallet when a customer removes a pass from their device.
+        Removes the device registration.
+      tags: [Apple Web Service Protocol]
+      security:
+        - applePassAuth: []
+      parameters:
+        - $ref: "#/components/parameters/deviceLibraryIdentifier"
+        - $ref: "#/components/parameters/passTypeIdentifier"
+        - $ref: "#/components/parameters/serialNumber"
+      responses:
+        "200":
+          description: Registration removed
+        "401":
+          description: Unauthorized
+
+  /api/apple/v1/devices/{deviceLibraryIdentifier}/registrations/{passTypeIdentifier}:
+    get:
+      operationId: getUpdatedPasses
+      summary: "Apple Web Service: Get serial numbers of updated passes"
+      description: |
+        Called by Apple Wallet to check which passes have been updated since
+        a given tag. Returns serial numbers and a new lastUpdated tag.
+      tags: [Apple Web Service Protocol]
+      security:
+        - applePassAuth: []
+      parameters:
+        - $ref: "#/components/parameters/deviceLibraryIdentifier"
+        - $ref: "#/components/parameters/passTypeIdentifier"
+        - name: passesUpdatedSince
+          in: query
+          schema:
+            type: string
+          description: UNIX timestamp tag from previous response
+      responses:
+        "200":
+          description: Updated passes found
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [serialNumbers, lastUpdated]
+                properties:
+                  serialNumbers:
+                    type: array
+                    items:
+                      type: string
+                  lastUpdated:
+                    type: string
+                    description: UNIX timestamp as string
+        "204":
+          description: No updated passes since the given tag
+
+  /api/apple/v1/passes/{passTypeIdentifier}/{serialNumber}:
+    get:
+      operationId: getLatestPass
+      summary: "Apple Web Service: Get latest version of a pass"
+      description: |
+        Called by Apple Wallet to download the latest .pkpass file.
+        Supports If-Modified-Since for 304 responses.
+      tags: [Apple Web Service Protocol]
+      security:
+        - applePassAuth: []
+      parameters:
+        - $ref: "#/components/parameters/passTypeIdentifier"
+        - $ref: "#/components/parameters/serialNumber"
+        - name: If-Modified-Since
+          in: header
+          schema:
+            type: string
+          description: HTTP date — returns 304 if pass not modified since
+      responses:
+        "200":
+          description: Latest .pkpass file
+          content:
+            application/vnd.apple.pkpass:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Last-Modified:
+              schema:
+                type: string
+              description: HTTP date of last pass modification
+        "304":
+          description: Pass not modified since If-Modified-Since date
+        "401":
+          description: Unauthorized
+
+  /api/apple/v1/log:
+    post:
+      operationId: logErrors
+      summary: "Apple Web Service: Log errors from Apple Wallet"
+      description: |
+        Called by Apple Wallet to report errors. The server logs these
+        for debugging but does not act on them programmatically.
+      tags: [Apple Web Service Protocol]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [logs]
+              properties:
+                logs:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Errors logged
+
+# ==============================================================================
+# COMPONENTS
+# ==============================================================================
+
+components:
+
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      description: Laravel Sanctum bearer token
+    hmacAuth:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: HMAC-SHA256 signature of request body using shared secret
+    applePassAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "ApplePass {authenticationToken}"
+
+  parameters:
+    deviceLibraryIdentifier:
+      name: deviceLibraryIdentifier
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Apple-assigned unique device identifier
+    passTypeIdentifier:
+      name: passTypeIdentifier
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Pass type identifier (e.g., pass.com.example.loyalty)
+    serialNumber:
+      name: serialNumber
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Pass serial number (UUID)
+
+  schemas:
+
+    UpdatePassFieldsRequest:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: object
+          description: "Key-value pairs of field updates. Keys are field identifiers from the pass template."
+          additionalProperties:
+            type: string
+          example:
+            balance: "75"
+            promotion_text: "Summer Sale - 20% off!"
+        change_messages:
+          type: object
+          description: "Optional per-field change message templates. Use %@ for the new value placeholder."
+          additionalProperties:
+            type: string
+          example:
+            balance: "You now have %@ points!"
+
+    PassUpdateResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            pass_id:
+              type: integer
+            fields_changed:
+              type: object
+              description: "Map of field key → {old, new}"
+            apple_delivery_status:
+              type: string
+              enum: [pending, sent, delivered, failed, skipped]
+            google_delivery_status:
+              type: string
+              enum: [pending, sent, delivered, failed, skipped]
+            apple_devices_notified:
+              type: integer
+            google_updated:
+              type: boolean
+            created_at:
+              type: string
+              format: date-time
+
+    BulkUpdateRequest:
+      type: object
+      required: [pass_template_id, field_key, field_value]
+      properties:
+        pass_template_id:
+          type: integer
+        field_key:
+          type: string
+        field_value:
+          type: string
+        filters:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [active]
+            platform:
+              type: string
+              enum: [apple, google]
+
+    BulkUpdateResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            status:
+              type: string
+              enum: [pending]
+            total_count:
+              type: integer
+            message:
+              type: string
+              example: "Bulk update queued for 500 passes"
+
+    BulkUpdateStatusResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            status:
+              type: string
+              enum: [pending, processing, completed, failed, cancelled]
+            total_count:
+              type: integer
+            processed_count:
+              type: integer
+            failed_count:
+              type: integer
+            started_at:
+              type: string
+              format: date-time
+              nullable: true
+            completed_at:
+              type: string
+              format: date-time
+              nullable: true
+            estimated_completion:
+              type: string
+              format: date-time
+              nullable: true
+              description: Estimated completion time based on current processing rate
+
+    PassUpdateHistoryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassUpdateResponse/properties/data"
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            last_page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string

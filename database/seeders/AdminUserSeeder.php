@@ -13,9 +13,13 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         // Make the first user an admin
-        User::query()
+        $user = User::query()
             ->orderBy('id')
-            ->first()
-            ?->update(['is_admin' => true]);
+            ->first();
+
+        if ($user) {
+            $user->is_admin = true;
+            $user->save();
+        }
     }
 }

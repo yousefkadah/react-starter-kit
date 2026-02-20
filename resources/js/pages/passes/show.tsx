@@ -1,16 +1,17 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import AppLayout from '@/layouts/app-layout';
-import * as passes from '@/routes/passes';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+    Apple,
+    ArrowLeft,
+    Chrome,
+    Download,
+    Edit,
+    ExternalLink,
+    Share2,
+    Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
+import { PassPreview } from '@/components/pass-preview';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -21,37 +22,59 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
-    Apple,
-    ArrowLeft,
-    Check,
-    Chrome,
-    Copy,
-    Download,
-    Edit,
-    ExternalLink,
-    QrCode,
-    Share2,
-    Trash2,
-} from 'lucide-react';
-import { Pass, PassStatus } from '@/types/pass';
-import { PassPreview } from '@/components/pass-preview';
-import { format } from 'date-fns';
-import { useClipboard } from '@/hooks/use-clipboard';
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import BulkUpdatePanel from '@/pages/passes/components/BulkUpdatePanel';
+import DeliveryStatusBadge from '@/pages/passes/components/DeliveryStatusBadge';
+import PassUpdatePanel from '@/pages/passes/components/PassUpdatePanel';
+import passes from '@/routes/passes';
+import type { Pass, PassStatus } from '@/types/pass';
+
+interface PassUpdateHistoryItem {
+    id: number;
+    fields_changed: Record<string, { old: string | null; new: string | null }>;
+    apple_delivery_status: 'pending' | 'sent' | 'delivered' | 'failed' | 'skipped' | null;
+    google_delivery_status: 'pending' | 'sent' | 'delivered' | 'failed' | 'skipped' | null;
+    created_at: string;
+}
 
 interface PassesShowProps {
     pass: Pass;
+    recentPassUpdates: PassUpdateHistoryItem[];
 }
 
-export default function PassesShow({ pass }: PassesShowProps) {
+export default function PassesShow({ pass, recentPassUpdates }: PassesShowProps) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [googleLink, setGoogleLink] = useState(pass.google_save_url);
-    const { copy, copied } = useClipboard();
+    const [passUpdates, setPassUpdates] = useState<PassUpdateHistoryItem[]>(recentPassUpdates);
     const { post: postDownload, processing: downloading } = useForm();
     const { post: postGenerate, processing: generating } = useForm();
     const { delete: deletePass, processing: deleting } = useForm();
+
+    const refreshPassUpdates = async () => {
+        const response = await fetch(`/passes/${pass.id}/updates`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const payload = await response.json();
+        setPassUpdates(payload.data ?? []);
+    };
 
     const handleDownloadApple = () => {
         postDownload(passes.download.apple({ pass: pass.id }).url, {
@@ -369,6 +392,54 @@ export default function PassesShow({ pass }: PassesShowProps) {
                     </Card>
 
                     {/* Public Sharing - Removed: Use the Share button above to manage distribution links */}
+
+                    <PassUpdatePanel
+                        passId={pass.id}
+                        passData={pass.pass_data}
+                        isVoided={pass.status === 'voided'}
+                        onUpdated={() => {
+                            void refreshPassUpdates();
+                        }}
+                    />
+
+                    <BulkUpdatePanel
+                        passTemplateId={pass.pass_template_id}
+                        passData={pass.pass_data}
+                    />
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Delivery Status</CardTitle>
+                            <CardDescription>Recent update delivery results for this pass.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {passUpdates.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No update history yet.</p>
+                                )}
+
+                                {passUpdates.map((update) => (
+                                    <div key={update.id} className="rounded-md border p-3">
+                                        <div className="mb-2 flex items-center justify-between text-sm">
+                                            <span className="font-medium">Update #{update.id}</span>
+                                            <span className="text-muted-foreground">
+                                                {format(new Date(update.created_at), 'PPp')}
+                                            </span>
+                                        </div>
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Apple</span>
+                                            <DeliveryStatusBadge status={update.apple_delivery_status} />
+                                            <span className="text-xs text-muted-foreground">Google</span>
+                                            <DeliveryStatusBadge status={update.google_delivery_status} />
+                                        </div>
+                                        <pre className="overflow-auto rounded bg-muted p-2 text-xs">
+                                            {JSON.stringify(update.fields_changed, null, 2)}
+                                        </pre>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Pass Data */}
                     <Card>

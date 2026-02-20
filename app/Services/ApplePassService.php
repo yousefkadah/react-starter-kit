@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\AppleCertificate;
 use App\Models\Pass;
+use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use ZipArchive;
@@ -29,18 +32,67 @@ class ApplePassService
 
     protected string $imagesPath;
 
-    public function __construct()
+    protected string $webServiceBaseUrl;
+
+    /**
+     * @param  array<string, string>  $overrides
+     */
+    public function __construct(array $overrides = [])
     {
-        $this->certificatePath = config('passkit.apple.certificate_path');
-        $this->certificatePassword = config('passkit.apple.certificate_password');
-        $this->wwdrCertificatePath = config('passkit.apple.wwdr_certificate_path');
-        $this->teamIdentifier = config('passkit.apple.team_identifier');
-        $this->passTypeIdentifier = config('passkit.apple.pass_type_identifier');
-        $this->organizationName = config('passkit.apple.organization_name');
+        $this->certificatePath = $overrides['certificate_path'] ?? (string) config('passkit.apple.certificate_path');
+        $this->certificatePassword = $overrides['certificate_password'] ?? (string) config('passkit.apple.certificate_password');
+        $this->wwdrCertificatePath = $overrides['wwdr_certificate_path'] ?? (string) config('passkit.apple.wwdr_certificate_path');
+        $this->teamIdentifier = $overrides['team_identifier'] ?? (string) config('passkit.apple.team_identifier');
+        $this->passTypeIdentifier = $overrides['pass_type_identifier'] ?? (string) config('passkit.apple.pass_type_identifier');
+        $this->organizationName = $overrides['organization_name'] ?? (string) config('passkit.apple.organization_name');
         $this->passesDisk = config('passkit.storage.passes_disk');
         $this->passesPath = config('passkit.storage.passes_path');
         $this->imagesDisk = config('passkit.storage.images_disk');
         $this->imagesPath = config('passkit.storage.images_path');
+        $this->webServiceBaseUrl = $overrides['web_service_base_url'] ?? (string) config('passkit.web_service.base_url', '');
+    }
+
+    /**
+     * Build a service instance using a specific user's Apple credentials.
+     */
+    public static function forUser(User $user): self
+    {
+        /** @var AppleCertificate|null $certificate */
+        $certificate = $user->appleCertificates()
+            ->whereNull('deleted_at')
+            ->where(function ($query): void {
+                $query->whereNull('status')->orWhere('status', '!=', 'archived');
+            })
+            ->latest('id')
+            ->first();
+
+        if ($certificate === null) {
+            return new self;
+        }
+
+        $certificatesDisk = (string) config('passkit.storage.certificates_disk', 'local');
+        $certificatePath = $certificate->path;
+
+        if (! file_exists($certificatePath)) {
+            $certificatePath = Storage::disk($certificatesDisk)->path($certificate->path);
+        }
+
+        $certificatePassword = '';
+        if (is_string($certificate->password) && $certificate->password !== '') {
+            try {
+                $certificatePassword = Crypt::decryptString($certificate->password);
+            } catch (\Throwable) {
+                $certificatePassword = $certificate->password;
+            }
+        }
+
+        return new self([
+            'certificate_path' => $certificatePath,
+            'certificate_password' => $certificatePassword,
+            'team_identifier' => (string) ($user->apple_team_id ?: config('passkit.apple.team_identifier')),
+            'pass_type_identifier' => (string) ($user->apple_pass_type_id ?: config('passkit.apple.pass_type_identifier')),
+            'organization_name' => (string) ($user->business_name ?: config('passkit.apple.organization_name')),
+        ]);
     }
 
     /**
@@ -109,6 +161,14 @@ class ApplePassService
             'organizationName' => $this->organizationName,
             'description' => $passData['description'] ?? 'Digital Pass',
         ];
+
+        if (is_string($pass->authentication_token) && $pass->authentication_token !== '') {
+            $json['authenticationToken'] = $pass->authentication_token;
+        }
+
+        if ($this->webServiceBaseUrl !== '') {
+            $json['webServiceURL'] = rtrim($this->webServiceBaseUrl, '/');
+        }
 
         // Add colors
         if (! empty($passData['backgroundColor'])) {

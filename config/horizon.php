@@ -219,11 +219,29 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'push-notifications' => [
+                'connection' => 'redis',
+                'queue' => ['push-notifications'],
+                'balance' => 'auto',
+                'autoScalingStrategy' => 'time',
+                'maxProcesses' => 5,
+                'tries' => 3,
+                'timeout' => 120,
+            ],
         ],
 
         'local' => [
             'supervisor-1' => [
                 'maxProcesses' => 3,
+            ],
+            'push-notifications' => [
+                'connection' => 'redis',
+                'queue' => ['push-notifications'],
+                'balance' => 'auto',
+                'autoScalingStrategy' => 'time',
+                'maxProcesses' => 2,
+                'tries' => 3,
+                'timeout' => 120,
             ],
         ],
     ],

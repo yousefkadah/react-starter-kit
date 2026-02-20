@@ -52,6 +52,7 @@ class ProductionApprovalController extends Controller
     public function approved(): JsonResponse
     {
         $requests = User::whereNotNull('production_approved_at')
+            ->with('productionApprovedBy')
             ->paginate(15);
 
         return response()->json([

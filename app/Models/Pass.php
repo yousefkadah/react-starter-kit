@@ -25,6 +25,7 @@ class Pass extends Model
         'platforms',
         'pass_type',
         'serial_number',
+        'authentication_token',
         'status',
         'pass_data',
         'barcode_data',
@@ -34,6 +35,15 @@ class Pass extends Model
         'google_class_id',
         'google_object_id',
         'last_generated_at',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'authentication_token',
     ];
 
     /**
@@ -48,6 +58,7 @@ class Pass extends Model
             'pass_data' => 'array',
             'barcode_data' => 'array',
             'images' => 'array',
+            'authentication_token' => 'string',
             'last_generated_at' => 'datetime',
         ];
     }
@@ -74,6 +85,30 @@ class Pass extends Model
     public function distributionLinks(): HasMany
     {
         return $this->hasMany(PassDistributionLink::class, 'pass_id');
+    }
+
+    /**
+     * Get active device registrations for this pass.
+     */
+    public function deviceRegistrations(): HasMany
+    {
+        return $this->hasMany(DeviceRegistration::class, 'serial_number', 'serial_number');
+    }
+
+    /**
+     * Get update history for this pass.
+     */
+    public function passUpdates(): HasMany
+    {
+        return $this->hasMany(PassUpdate::class);
+    }
+
+    /**
+     * Determine if this pass has any registered active devices.
+     */
+    public function hasRegisteredDevices(): bool
+    {
+        return $this->deviceRegistrations()->active()->exists();
     }
 
     /**

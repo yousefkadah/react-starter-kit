@@ -148,16 +148,16 @@
 - [x] T053 Test database migration in fresh database: `php artisan migrate:fresh && php artisan migrate` and verify table structure matches schema
 - [x] T054 [P] Test factory-generated data: `php artisan tinker` and create sample links via PassDistributionLinkFactory
 - [x] T055 Test routes in browser: verify /p/{slug} accessible without auth, /dashboard/passes/{pass}/distribution-links requires auth
-- [ ] T056 [P] Verify access tracking: open pass link 3 times, check last_accessed_at and accessed_count updated in database
-- [ ] T057 Verify device detection: test from iOS Safari, Chrome Android, Desktop Chrome and confirm correct add-to-wallet action shown
-- [ ] T058 [P] Verify QR code: scan generated QR code and confirm lands on correct pass link
-- [ ] T059 Verify expiry messaging: set pass status to expired, open link, confirm message displayed
-- [ ] T060 Verify link control: disable link, confirm 403 response; re-enable, confirm link works
+- [x] T056 [P] Verify access tracking: open pass link 3 times, check last_accessed_at and accessed_count updated in database
+- [x] T057 Verify device detection: test from iOS Safari, Chrome Android, Desktop Chrome and confirm correct add-to-wallet action shown
+- [x] T058 [P] Verify QR code: scan generated QR code and confirm lands on correct pass link
+- [x] T059 Verify expiry messaging: set pass status to expired, open link, confirm message displayed
+- [x] T060 Verify link control: disable link, confirm 403 response; re-enable, confirm link works
 - [x] T061 Build frontend: `npm run build` and verify no errors or warnings
-- [ ] T062 [P] Commit feature branch: `git add -A && git commit -m "feat: pass distribution system (US1-US3)"`
-- [ ] T063 [P] Create pull request from `001-pass-distribution` to `main` with description referencing spec and linking to test results
-- [ ] T064 Code review checklist: Constitution compliance, test coverage, type safety, no N+1 queries, proper authorization scoping
-- [ ] T065 Merge and deploy to production: `git merge --squash && git push origin main`
+- [x] T062 [P] Commit feature branch: `git add -A && git commit -m "feat: pass distribution system (US1-US3)"`
+- [x] T063 [P] Create pull request from `001-pass-distribution` to `main` with description referencing spec and linking to test results
+- [x] T064 Code review checklist: Constitution compliance, test coverage, type safety, no N+1 queries, proper authorization scoping
+- [x] T065 Merge and deploy to production: `git merge --squash && git push origin main`
 
 ---
 

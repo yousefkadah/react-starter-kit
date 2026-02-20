@@ -18,11 +18,13 @@ Route::get('p/{slug}', [PassDistributionController::class, 'show'])
 Route::get('dashboard', function () {
     $user = auth()->user();
 
+    $totalPasses = $user->passes()->count();
+
     $stats = [
-        'totalPasses' => $user->passes()->count(),
-        'applePasses' => $user->passes()->where('platform', 'apple')->count(),
-        'googlePasses' => $user->passes()->where('platform', 'google')->count(),
-        'used' => $user->passes()->count(),
+        'totalPasses' => $totalPasses,
+        'applePasses' => $user->passes()->whereJsonContains('platforms', 'apple')->count(),
+        'googlePasses' => $user->passes()->whereJsonContains('platforms', 'google')->count(),
+        'used' => $totalPasses,
         'limit' => app(\App\Services\PassLimitService::class)->getPlanConfig($user)['pass_limit'],
     ];
 

@@ -39,6 +39,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Push Notifications Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Apple APNS and push retry behavior.
+    |
+    */
+
+    'push' => [
+        'apns_environment' => env('APNS_ENVIRONMENT', 'production'),
+        'rate_limit_per_second' => (int) env('PASSKIT_PUSH_RATE_LIMIT_PER_SECOND', 50),
+        'max_retries' => (int) env('PASSKIT_PUSH_MAX_RETRIES', 3),
+        'retry_backoff' => [30, 120, 600],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apple Web Service Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Base URL used in generated pass.json webServiceURL field.
+    |
+    */
+
+    'web_service' => [
+        'base_url' => env('PASSKIT_WEB_SERVICE_URL', ''),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Subscription Plans
     |--------------------------------------------------------------------------
     |

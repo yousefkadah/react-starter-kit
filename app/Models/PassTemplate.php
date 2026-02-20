@@ -58,4 +58,20 @@ class PassTemplate extends Model
     {
         return $this->hasMany(Pass::class, 'pass_template_id');
     }
+
+    /**
+     * Get bulk updates for the template.
+     */
+    public function bulkUpdates(): HasMany
+    {
+        return $this->hasMany(BulkUpdate::class);
+    }
+
+    /**
+     * Check if this template currently has a bulk update in progress.
+     */
+    public function hasBulkUpdateInProgress(): bool
+    {
+        return $this->bulkUpdates()->inProgress()->exists();
+    }
 }
